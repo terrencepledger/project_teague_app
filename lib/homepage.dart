@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:project_teague_app/Objects.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:project_teague_app/infoPages.dart';
+import 'package:project_teague_app/signIn.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({ Key key }) : super(key: key);
@@ -21,8 +23,8 @@ class _HomePage extends State<HomePage> {
     super.initState();
     setState(() {
       items.addAll([
-        CarouselItem(FittedBox(child: Text("Intro Text")), sliderController),
-        CarouselItem(FittedBox(child: Text("Intro Text x2")), sliderController),
+        CarouselItem(OverviewSlide(), sliderController),
+        CarouselItem(HotelSlide(), sliderController),
         CarouselItem(FittedBox(child: Text("Intro Text x3")), sliderController)
       ]);    
     }); 
@@ -216,9 +218,9 @@ class _HomePage extends State<HomePage> {
                                       MultiSelectDialogField<FamilyMember>(
                                         selectedColor: Colors.white24,
                                         searchable: true,
-                                        backgroundColor: Colors.lightBlue.withOpacity(0.7),
+                                        backgroundColor: Colors.lightBlue.withOpacity(0.85),
                                         chipDisplay: MultiSelectChipDisplay<FamilyMember>.none(),
-                                        buttonText: Text("Click Here to Select Members", style: Theme.of(context).textTheme.headline5,),
+                                        buttonText: Text("Click Here", style: Theme.of(context).textTheme.headline5,),
                                         title: Text("Select Members"),
                                         items: choices,
                                         onConfirm: (items) {
@@ -297,23 +299,19 @@ class _HomePage extends State<HomePage> {
 
     return Column(
       children: [
-        Expanded(child: 
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: CarouselSlider(
-              items: items,
-              carouselController: sliderController,
-              options: CarouselOptions(
-                autoPlay: true,
-                autoPlayInterval: Duration(seconds: 15),
-                enlargeCenterPage: true,
-                viewportFraction: 0.9,
-              )
-            ),
-          )
+        Expanded(
+          child: CarouselSlider(
+            items: items,
+            carouselController: sliderController,
+            options: CarouselOptions(
+              aspectRatio: 13/7,
+              enlargeCenterPage: true,
+              viewportFraction: 1,
+            )
+          ),
         ),
         Padding(
-          padding: const EdgeInsets.all(50),
+          padding: const EdgeInsets.all(20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

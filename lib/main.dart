@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_teague_app/directorypage.dart';
 
 import 'homepage.dart';
+import 'signIn.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,14 +34,31 @@ class App extends StatefulWidget {
   App({Key key}) : super(key: key);
 
   @override
-  _AppState createState() => _AppState();
+  _AppState createState() => _AppState(SignIn());
   
 }
 
 class _AppState extends State<App> {
 
+  SignIn signIn;
+  String displayName = "";
+
   Widget pageBody = HomePage();
   Widget pageTitle = Text("Home");
+
+  _AppState(SignIn signIn) {
+
+    this.signIn = signIn;
+    
+    Function func = (String name) {
+      setState(() {
+        displayName = name;
+      });
+    };
+
+    signIn.listener(func);
+
+  }
 
   Widget menu() {
     return Container(
@@ -61,7 +79,7 @@ class _AppState extends State<App> {
               },
             ),
           ),
-
+          
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
@@ -86,10 +104,20 @@ class _AppState extends State<App> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("KC Teague Family Reunion 2022"),
-            pageTitle
+            Column(
+              children: [
+                Text("KC Teague Family Reunion 2022"),
+                pageTitle
+              ],
+            ),
+            Column(
+              children: [
+                Text(displayName)
+              ],
+            )
           ],
         ),
       ),

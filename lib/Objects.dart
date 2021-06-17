@@ -12,17 +12,19 @@ class CarouselItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-      child: Column(
-        children: [
-          Expanded(child: item),
-          Row(children: [
-            IconButton(iconSize: 100, icon: Icon(Icons.arrow_back), onPressed: () {sliderController.previousPage();}),
-            IconButton(iconSize: 100, icon: Icon(Icons.arrow_forward), onPressed: () {sliderController.nextPage();})
+      child: Scaffold(
+        body: Container(
+          constraints: BoxConstraints.expand(),
+          child: item,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+        floatingActionButton: Row(children: [
+            IconButton(iconSize: 60, icon: Icon(Icons.arrow_back), onPressed: () {sliderController.previousPage();}),
+            IconButton(iconSize: 60, icon: Icon(Icons.arrow_forward), onPressed: () {sliderController.nextPage();})
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          )
-        ]
-      )
+        ),  
+      ),
     );
   }
 
