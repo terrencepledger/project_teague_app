@@ -1,9 +1,12 @@
 Login:
     ☐ Save payment status
 HomePage:
-    ☐ Add Vote for Activities Button
+    ✔ Add Vote for Activities Button @done (6/17/2021, 6:48:27 PM)
+    ☐ Add Polls dialogue
+MemoriesPage:
+    ☐ Create haha
 InfoPages:
-    ☐ Add Activities Slide
+    ✔ Add Activities Slide @done (6/17/2021, 6:48:23 PM)
 DirectoryPage:
     ☐ Format results
     ☐ Implement sorting on directory page

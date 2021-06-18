@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:project_teague_app/Objects.dart';
@@ -7,25 +8,52 @@ import 'package:project_teague_app/infoPages.dart';
 import 'package:project_teague_app/signIn.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({ Key key }) : super(key: key);
+
+  SignIn signIn;
+
+  HomePage(SignIn signIn, { Key key })
+  {
+    this.signIn = signIn;
+  }
 
   @override
-  _HomePage createState() => _HomePage();
+  _HomePage createState() => _HomePage(signIn);
+
 }
 
 class _HomePage extends State<HomePage> {
-  
+
+  SignIn signIn;
   List<Widget> items = [];
   CarouselController sliderController = CarouselController();
+  DatabaseReference ref;
+
+  _HomePage(SignIn signIn) {
+
+    this.signIn = signIn;
+    
+  }
 
   @override
   void initState() { 
     super.initState();
+
+    initializeApp(
+      apiKey: "AIzaSyBhlfX8XnrV7pWWt-aIvk9VPAboGmi-6nw",
+      authDomain: "kcteaguesite.firebaseapp.com",
+      databaseURL: "https://kcteaguesite-default-rtdb.firebaseio.com",
+      projectId: "kcteaguesite",
+      storageBucket: "kcteaguesite.appspot.com",
+    );
+
+    Database db = database();
+    ref = db.ref('activities');
+
     setState(() {
       items.addAll([
         CarouselItem(OverviewSlide(), sliderController),
         CarouselItem(HotelSlide(), sliderController),
-        CarouselItem(FittedBox(child: Text("Intro Text x3")), sliderController)
+        CarouselItem(ActivitiesSlide(), sliderController)
       ]);    
     }); 
   }
@@ -294,6 +322,57 @@ class _HomePage extends State<HomePage> {
 
   }
 
+  void showPollDialog() async {
+    if(signIn.currentUser != null)
+    {
+      print("Here");
+      print(signIn.currentUser.email);
+      var name = "bruh";
+      var test = "orig";
+      ref.child(signIn.currentUser.id).set(signIn.currentUser.email).onError((error, stackTrace) => {setState(() {test= "er " + error.toString();})}).whenComplete(()
+        {
+          setState(() {test="modified";});
+        }
+      );   
+      showDialog(context: context, 
+        builder: (buildContext) {
+          return StatefulBuilder(builder: (context, setState) {   
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Card(
+                  color: Colors.grey,
+                  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.elliptical(12, 12))),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(name),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(test),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          ref.child(signIn.currentUser.id).onValue.listen((event) {
+                            setState(() {name=event.snapshot.val();test="modified again";});
+                          });
+                        }, 
+                        child: Text("Ye")
+                      )
+                    ],
+                  )
+                ),
+              ),
+            );
+          });
+        }
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -315,12 +394,26 @@ class _HomePage extends State<HomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  showPurchaseDialog();
-                }, 
-                child: Text("Purchase Tickets!", 
-                  style: TextStyle(fontSize: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    showPurchaseDialog();
+                  }, 
+                  child: Text("Purchase Tickets!", 
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    showPollDialog();
+                  }, 
+                  child: Text("Vote for Activities!", 
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ),
               ),
             ],

@@ -43,12 +43,14 @@ class _AppState extends State<App> {
   SignIn signIn;
   String displayName = "";
 
-  Widget pageBody = HomePage();
-  Widget pageTitle = Text("Home");
+  Widget pageBody;
+  Widget pageTitle;
 
   _AppState(SignIn signIn) {
 
     this.signIn = signIn;
+    pageTitle = Text("Home");
+    pageBody = HomePage(signIn);
     
     Function func = (String name) {
       setState(() {
@@ -73,7 +75,7 @@ class _AppState extends State<App> {
               child: Text('Home'),
               onPressed: () {
                 setState(() {
-                  pageBody = HomePage();
+                  pageBody = HomePage(signIn);
                   pageTitle = Text('Home');
                 });
               },
