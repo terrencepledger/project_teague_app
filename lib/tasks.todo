@@ -1,15 +1,27 @@
+☐ Mobile Optimization
 Login:
     ☐ Save payment status
+    ☐ Prompt Create new family member if gmail not recognized
 HomePage:
     ✔ Add Vote for Activities Button @done (6/17/2021, 6:48:27 PM)
-    ☐ Add Polls dialogue
+    ✔ Add Polls dialogue @done (6/20/2021, 2:35:35 PM)
+    ✔ Links to poll choices @done (6/25/2021, 1:35:40 PM)
+    ☐ Change Click Here text on purchase tickets popup
+    ☐ Add incomplete alert on create members popup
+    ☐ Change age to dob and add calendar input 
+    ☐ Automatically add created members to popup
+    ☐ Add Tshirts slide
+ActivitiesPage:
+    ✔ Create @done (6/25/2021, 1:35:35 PM)
+PaymentPage:
+    ☐ Create
 MemoriesPage:
-    ☐ Create haha
+    ☐ Create
 InfoPages:
     ✔ Add Activities Slide @done (6/17/2021, 6:48:23 PM)
+    ✔ Add slide explaining activities @done (6/25/2021, 1:35:50 PM)
 DirectoryPage:
     ☐ Format results
     ☐ Implement sorting on directory page
     ☐ Add edit requests
-    ☐ Add identifier for paid members
     ☐ Add create member button

@@ -1,10 +1,19 @@
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
+import 'package:project_teague_app/activitiesPage.dart';
 import 'package:project_teague_app/directorypage.dart';
 
 import 'homepage.dart';
 import 'signIn.dart';
 
 void main() {
+  initializeApp(
+    apiKey: "AIzaSyBhlfX8XnrV7pWWt-aIvk9VPAboGmi-6nw",
+    authDomain: "kcteaguesite.firebaseapp.com",
+    databaseURL: "https://kcteaguesite-default-rtdb.firebaseio.com",
+    projectId: "kcteaguesite",
+    storageBucket: "kcteaguesite.appspot.com",
+  );
   runApp(MyApp());
 }
 
@@ -49,8 +58,8 @@ class _AppState extends State<App> {
   _AppState(SignIn signIn) {
 
     this.signIn = signIn;
-    pageTitle = Text("Home");
-    pageBody = HomePage(signIn);
+    pageTitle = Text("Home", textAlign: TextAlign.left,);
+    pageBody = HomePage(signIn, navigate);
     
     Function func = (String name) {
       setState(() {
@@ -62,7 +71,35 @@ class _AppState extends State<App> {
 
   }
 
+  void navigate(int page) {
+
+    Widget x;
+    String y;
+
+    switch (page) {
+      case 0:
+          x = HomePage(signIn, navigate);
+          y = 'Home';
+        break;
+      case 1: 
+          x = DirectoryPage();
+          y = 'Directory';
+        break;
+      case 2: 
+        x = ActivitiesPage(signIn);
+        y = 'Activities Poll';
+      break;
+    }
+
+    setState(() {
+      pageBody = x;
+      pageTitle = Text(y, textAlign: TextAlign.left,);
+    });
+
+  }
+
   Widget menu() {
+    
     return Container(
       color: Theme.of(context).primaryColorLight,
       child: Row(
@@ -73,12 +110,7 @@ class _AppState extends State<App> {
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
               child: Text('Home'),
-              onPressed: () {
-                setState(() {
-                  pageBody = HomePage(signIn);
-                  pageTitle = Text('Home');
-                });
-              },
+              onPressed: () { navigate(0); },
             ),
           ),
           
@@ -86,12 +118,15 @@ class _AppState extends State<App> {
             padding: const EdgeInsets.all(8.0),
             child: TextButton(
               child: Text('Directory'),
-              onPressed: () {
-                setState(() {
-                  pageBody = DirectoryPage();
-                  pageTitle = Text('Directory');
-                });
-              },
+              onPressed: () { navigate(1); }
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton(
+              child: Text('Activites Poll'),
+              onPressed: () { navigate(2); },
             ),
           ),
 
@@ -109,17 +144,16 @@ class _AppState extends State<App> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              children: [
-                Text("KC Teague Family Reunion 2022"),
-                pageTitle
-              ],
-            ),
-            Column(
-              children: [
-                Text(displayName)
-              ],
-            )
+            Expanded(
+              flex: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("KC Teague Family Reunion 2022", textAlign: TextAlign.left,),
+                  pageTitle
+                ],
+              ),
+            ),Spacer(), Expanded(flex: 1, child: Text(displayName, overflow: TextOverflow.ellipsis, textAlign: TextAlign.right,))
           ],
         ),
       ),

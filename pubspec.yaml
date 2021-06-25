@@ -38,8 +38,9 @@ dependencies:
   google_sign_in: ^5.0.3
   google_sign_in_web: ^0.10.0
   http: ^0.13.3
-  polls: ^1.0.1
   firebase: ^9.0.1
+  flutter_signin_button: ^2.0.0
+  percent_indicator: ^3.0.1
 
 dev_dependencies:
   flutter_test:

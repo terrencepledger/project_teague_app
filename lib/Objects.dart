@@ -52,12 +52,12 @@ class FamilyMember{
   String email;
   String location;
   String phone;
-  int age;
+  String dob;
 
   bool registered = false;
   DateTime registeredDate;
 
-  FamilyMember(this.name, this.email, this.location, this.age) {
+  FamilyMember(this.name, this.email, this.location, this.dob) {
     // name = name.characters.first.toUpperCase() + name.characters.getRange(1).join();
   }
 
@@ -65,13 +65,13 @@ class FamilyMember{
 
   String displayInfo() {
 
-    return "${name.split(' ').last}, ${name.split(' ').first}; $location; $age";
+    return "${name.split(' ').last}, ${name.split(' ').first}; $location; $dob";
 
   }
 
   String allInfo() {
 
-    return "${name.split(' ').last}, ${name.split(' ').first}; $email;${phone != null ? " $phone; " : null}$location; $age";
+    return "${name.split(' ').last}, ${name.split(' ').first}; $email;${phone != null ? " $phone; " : null}$location; $dob";
 
   }
 

@@ -10,60 +10,48 @@ import 'package:project_teague_app/signIn.dart';
 class HomePage extends StatefulWidget {
 
   SignIn signIn;
+  Function navigate;
 
-  HomePage(SignIn signIn, { Key key })
-  {
-    this.signIn = signIn;
-  }
+  HomePage(this.signIn, this.navigate, { Key key });
 
   @override
-  _HomePage createState() => _HomePage(signIn);
+  _HomePage createState() => _HomePage(signIn, navigate);
 
 }
 
 class _HomePage extends State<HomePage> {
 
   SignIn signIn;
+  Function navigate;
   List<Widget> items = [];
   CarouselController sliderController = CarouselController();
   DatabaseReference ref;
 
-  _HomePage(SignIn signIn) {
-
-    this.signIn = signIn;
-    
-  }
+  _HomePage(this.signIn, this.navigate);
 
   @override
   void initState() { 
     super.initState();
 
-    initializeApp(
-      apiKey: "AIzaSyBhlfX8XnrV7pWWt-aIvk9VPAboGmi-6nw",
-      authDomain: "kcteaguesite.firebaseapp.com",
-      databaseURL: "https://kcteaguesite-default-rtdb.firebaseio.com",
-      projectId: "kcteaguesite",
-      storageBucket: "kcteaguesite.appspot.com",
-    );
-
     Database db = database();
-    ref = db.ref('activities');
+    ref = db.ref('users');
 
     setState(() {
       items.addAll([
         CarouselItem(OverviewSlide(), sliderController),
         CarouselItem(HotelSlide(), sliderController),
-        CarouselItem(ActivitiesSlide(), sliderController)
+        CarouselItem(ActivitiesSlide(navigate), sliderController)
       ]);    
     }); 
+
   }
 
   void showPurchaseDialog() async {
     
     List<FamilyMember> selected = [];
     List<MultiSelectItem<FamilyMember>> choices = [
-      MultiSelectItem(FamilyMember("A", "a@a.com", "KCK", 10), "A"),MultiSelectItem(FamilyMember("B", "b@a.com", "KCK", 32), "B"),
-      MultiSelectItem(FamilyMember("C", "c@a.com", "KCK", 15), "C"),
+      MultiSelectItem(FamilyMember("A", "a@a.com", "KCK", "10"), "A"),MultiSelectItem(FamilyMember("B", "b@a.com", "KCK", "32"), "B"),
+      MultiSelectItem(FamilyMember("C", "c@a.com", "KCK", "15"), "C"),
     ];
     
     void showCreateMembers() {
@@ -71,13 +59,13 @@ class _HomePage extends State<HomePage> {
       List<TextEditingController> names = [];
       List<TextEditingController> emails = [];
       List<TextEditingController> locations = [];
-      List<TextEditingController> ages = [];
+      List<TextEditingController> dobs = [];
       
       Row inputRow() { 
         names.add(TextEditingController());
         emails.add(TextEditingController());
         locations.add(TextEditingController());
-        ages.add(TextEditingController());
+        dobs.add(TextEditingController());
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -122,11 +110,11 @@ class _HomePage extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: ages.last,
+                  controller: dobs.last,
                   style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: "Age"
+                    labelText: "Date of Birth"
                   ),
                 ),
               ),
@@ -167,11 +155,11 @@ class _HomePage extends State<HomePage> {
                         List<FamilyMember> membersToAdd = [];
                         for (var i = 0; i < names.length; i++) {
                           if(names.elementAt(i).text.isNotEmpty && emails.elementAt(i).text.isNotEmpty &&
-                            locations.elementAt(i).text.isNotEmpty && ages.elementAt(i).text.isNotEmpty
+                            locations.elementAt(i).text.isNotEmpty && dobs.elementAt(i).text.isNotEmpty
                           ) {
                             membersToAdd.add(
                               FamilyMember(names.elementAt(i).text, emails.elementAt(i).text,
-                                locations.elementAt(i).text, int.parse(ages.elementAt(i).text)
+                                locations.elementAt(i).text, dobs.elementAt(i).text
                               )
                             );
                           }
@@ -180,7 +168,7 @@ class _HomePage extends State<HomePage> {
                           choices.addAll(membersToAdd.map((e) => MultiSelectItem(e, e.displayInfo())).toList());
                         });
                         Navigator.of(context).pop();
-                      }, child: Text("Submit")),
+                      }, child: SelectableText("Submit")),
                     )
                   ]
                 ),
@@ -222,7 +210,7 @@ class _HomePage extends State<HomePage> {
                           children: [
                             ElevatedButton(
                               onPressed: () => showCreateMembers(),
-                              child: Text("Create Members")
+                              child: SelectableText("Create Members")
                             )
                           ], 
                           ),
@@ -249,7 +237,7 @@ class _HomePage extends State<HomePage> {
                                         backgroundColor: Colors.lightBlue.withOpacity(0.85),
                                         chipDisplay: MultiSelectChipDisplay<FamilyMember>.none(),
                                         buttonText: Text("Click Here", style: Theme.of(context).textTheme.headline5,),
-                                        title: Text("Select Members"),
+                                        title: SelectableText("Select Members"),
                                         items: choices,
                                         onConfirm: (items) {
                                           updateMembers(items);
@@ -259,7 +247,7 @@ class _HomePage extends State<HomePage> {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Text("No Members Selected",
+                                            child: SelectableText("No Members Selected",
                                               textAlign: TextAlign.left, 
                                               style: Theme.of(context).textTheme.headline5.merge(
                                                 TextStyle(color: Colors.white, fontStyle: FontStyle.italic)
@@ -277,7 +265,7 @@ class _HomePage extends State<HomePage> {
                                             MyBullet(),
                                             Align(
                                               alignment: Alignment.centerLeft,
-                                              child: Text(selected.elementAt(index).displayInfo(), style: Theme.of(context).textTheme.headline5,),
+                                              child: SelectableText(selected.elementAt(index).displayInfo(), style: Theme.of(context).textTheme.headline5,),
                                             )
                                           ]
                                         );
@@ -294,13 +282,13 @@ class _HomePage extends State<HomePage> {
                               Expanded(
                                 child: Align(
                                   alignment: Alignment.centerLeft,
-                                  child: ElevatedButton(onPressed: () {}, child: Text("Purchase")),
+                                  child: ElevatedButton(onPressed: () {}, child: SelectableText("Purchase")),
                                 ),
                               ),
                               Expanded(
                                 child: Align(
                                   alignment: Alignment.centerLeft,
-                                  child: Text("Total: \$${(selected.length * 3).toStringAsFixed(2)}")
+                                  child: SelectableText("Total: \$${(selected.length * 3).toStringAsFixed(2)}")
                                 ),
                               ),
                             ]
@@ -322,104 +310,27 @@ class _HomePage extends State<HomePage> {
 
   }
 
-  void showPollDialog() async {
-    if(signIn.currentUser != null)
-    {
-      print("Here");
-      print(signIn.currentUser.email);
-      var name = "bruh";
-      var test = "orig";
-      ref.child(signIn.currentUser.id).set(signIn.currentUser.email).onError((error, stackTrace) => {setState(() {test= "er " + error.toString();})}).whenComplete(()
-        {
-          setState(() {test="modified";});
-        }
-      );   
-      showDialog(context: context, 
-        builder: (buildContext) {
-          return StatefulBuilder(builder: (context, setState) {   
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Card(
-                  color: Colors.grey,
-                  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.elliptical(12, 12))),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(name),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(test),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.child(signIn.currentUser.id).onValue.listen((event) {
-                            setState(() {name=event.snapshot.val();test="modified again";});
-                          });
-                        }, 
-                        child: Text("Ye")
-                      )
-                    ],
-                  )
-                ),
-              ),
-            );
-          });
-        }
-      );
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
 
-    return Column(
-      children: [
-        Expanded(
-          child: CarouselSlider(
-            items: items,
-            carouselController: sliderController,
-            options: CarouselOptions(
-              aspectRatio: 13/7,
-              enlargeCenterPage: true,
-              viewportFraction: 1,
-            )
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Expanded(
+            flex: 5,
+            child: CarouselSlider(
+              items: items,
+              carouselController: sliderController,
+              options: CarouselOptions(
+                aspectRatio: 15/7,
+                enlargeCenterPage: true,
+                viewportFraction: 1,
+              )
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    showPurchaseDialog();
-                  }, 
-                  child: Text("Purchase Tickets!", 
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    showPollDialog();
-                  }, 
-                  child: Text("Vote for Activities!", 
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
+        ],
+      ),
     );
 
   }
