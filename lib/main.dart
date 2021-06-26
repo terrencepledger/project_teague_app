@@ -2,6 +2,7 @@ import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:project_teague_app/activitiesPage.dart';
 import 'package:project_teague_app/directorypage.dart';
+import 'package:project_teague_app/paymentsPage.dart';
 
 import 'homepage.dart';
 import 'signIn.dart';
@@ -88,6 +89,10 @@ class _AppState extends State<App> {
       case 2: 
         x = ActivitiesPage(signIn);
         y = 'Activities Poll';
+        break;
+      case 3: 
+        x = PaymentsPage(signIn);
+        y = 'Payment';
       break;
     }
 
@@ -127,6 +132,14 @@ class _AppState extends State<App> {
             child: TextButton(
               child: Text('Activites Poll'),
               onPressed: () { navigate(2); },
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton(
+              child: Text('Payment'),
+              onPressed: () { navigate(3); },
             ),
           ),
 

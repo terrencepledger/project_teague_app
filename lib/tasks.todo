@@ -12,11 +12,11 @@ HomePage:
     ☐ Automatically add created members to popup
     ☐ Add Tshirts slide
 ActivitiesPage:
-    ✔ Create @done (6/25/2021, 1:35:35 PM)
+    ✔ Create @done (6/25/2021, 1:35:35 PM) 
 PaymentPage:
     ☐ Create
 MemoriesPage:
-    ☐ Create
+    ☐ Create @low 
 InfoPages:
     ✔ Add Activities Slide @done (6/17/2021, 6:48:23 PM)
     ✔ Add slide explaining activities @done (6/25/2021, 1:35:50 PM)

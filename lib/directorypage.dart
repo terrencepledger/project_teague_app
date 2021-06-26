@@ -1,3 +1,4 @@
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:random_string/random_string.dart';
 
@@ -11,6 +12,8 @@ class DirectoryPage extends StatefulWidget {
 
 class _DirectoryPageState extends State<DirectoryPage> {
   
+  DatabaseReference famRef;
+
   List<FamilyMember> members = [];
   TextEditingController searchController = TextEditingController();
 
@@ -18,19 +21,25 @@ class _DirectoryPageState extends State<DirectoryPage> {
   void initState() {
     
     super.initState();
+
+    famRef = database().ref('members');
     loadMembers();
 
 }
 
   void loadMembers() {
+    
+    famRef.once('value').then((query) {
+      
+      query.snapshot.forEach((child){
+        FamilyMember member = FamilyMember.toMember(child.val());
+        member.id = child.key;
+        setState(() {
+          members.add(member);
+        });
+      }); 
 
-    members.addAll(
-      List.generate(10, (index) => FamilyMember(
-        (randomString( randomBetween(2, 6) ) + randomString( randomBetween(2, 6) )),
-        (randomString( randomBetween(3, 9) ) + "@gmail.com" ), "KCK", randomString( randomBetween(3, 9))
-      ).addPhone("913709132" + randomBetween(0, 9).toString()))
-    );
-    members.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toUpperCase()));
+    });
 
   }
 

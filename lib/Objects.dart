@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CarouselItem extends StatelessWidget {
   
@@ -30,6 +31,17 @@ class CarouselItem extends StatelessWidget {
 
 }
 
+class Location {
+
+  String state;
+  String city;
+
+  Location(this.state, this.city);
+
+  String displayInfo() => state + ", " + city;
+
+}
+
 class MyBullet extends StatelessWidget{
 
   @override
@@ -48,11 +60,13 @@ class MyBullet extends StatelessWidget{
 
 class FamilyMember{
 
+  String id;
+
   String name;
   String email;
-  String location;
+  Location location;
   String phone;
-  String dob;
+  DateTime dob;
 
   bool registered = false;
   DateTime registeredDate;
@@ -65,13 +79,48 @@ class FamilyMember{
 
   String displayInfo() {
 
-    return "${name.split(' ').last}, ${name.split(' ').first}; $location; $dob";
+    String date = DateFormat('MM/dd/yyyy').format(dob);
+    return "${name.split(' ').last}, ${name.split(' ').first}; ${location.state}, ${location.city}; $date";
 
   }
 
   String allInfo() {
 
-    return "${name.split(' ').last}, ${name.split(' ').first}; $email;${phone != null ? " $phone; " : null}$location; $dob";
+    String date = DateFormat('MM/dd/yyyy').format(dob);
+    return "${name.split(' ').last}, ${name.split(' ').first}; $email;${phone != null ? " $phone; " : null}${ location.state}, ${location.city}; $date";
+
+  }
+
+  static Map<String, dynamic> toMap(FamilyMember member) {
+
+    Map<String, dynamic> object = {};
+    
+    object['name'] = member.name;
+    object['email'] = member.email;
+    object['location'] = {
+      'state': member.location.state, 
+      'city': member.location.city
+    };
+    // object['phone'] = member.phone;
+    object['dob'] = member.dob.millisecondsSinceEpoch;
+
+    return object;
+
+  }
+
+  static FamilyMember toMember(Map<String, dynamic> object) {
+
+    String name = object['name'];
+    String email = object['email'];
+    Location location = Location(
+      object['location']['state'],
+      object['location']['city']
+    );
+    // if()
+    // String phone = object['phone'];
+    DateTime dob = DateTime.fromMillisecondsSinceEpoch(object['dob']);
+
+    return FamilyMember(name, email, location, dob); 
 
   }
 
