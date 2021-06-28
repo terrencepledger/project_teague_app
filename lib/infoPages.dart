@@ -1,12 +1,34 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class UrlLauncher {
+
+  static Widget tryLaunch(String text, String url) {
+
+    void _launch() async {
+      await canLaunch(url) ? await launch(url) : print("cant launch");
+
+    }
+
+    return InkWell(child: Text(text), onTap: _launch,);
+
+  }
+
+} 
 
 class OverviewSlide extends StatelessWidget {
 
-  OverviewSlide({Key key}) : super(key: key);
+  Function navigate;
+
+  OverviewSlide(this.navigate, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,32 +43,37 @@ class OverviewSlide extends StatelessWidget {
         padding:
           new EdgeInsets.only(top:10, right: 25, bottom: 30, left: 30),
         child: FittedBox(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Welcome Teague Family!\n",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(decoration: TextDecoration.underline),
-                ),
-                Text(
-                  "July 29th - July 31st, 2022",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "\nFor this year, the reunion will be held at the\nRiver Walk in San Antonio, Texas"
-                  + "\n\nThere are a lot of FUN things to do in San Antonio and we've compiled a list of activities.\n"
-                  + "Please note all prices listed are the current 2021 prices and are SUBJECT TO CHANGE for 2022.\n\n"
-                  + "Since this is our FAMILY REUNION, we would like to do some of the activities\nas a group and we'd be able to get group rate discounts.\n"
-                  + "With that in mind we are asking everyone to select their top (4) choices and\nthe ones with the most votes will be the activities we do as a group.\n\n"
-                  + "Click the arrows to see more info on the hotel, the activities list, and the assessment info.\n",
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SelectableText(
+                "Welcome Teague Family!",
+                textAlign: TextAlign.center,
+                style: TextStyle(decoration: TextDecoration.underline),
+              ),
+              SelectableText(
+                "July 29th - July 31st, 2022",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SelectableText("\nFor this year, the reunion will be held at the River Walk in San Antonio, Texas"),
+              SelectableText("\nTo access more information such as the hotel, activities list,"),
+              SelectableText("activities poll, and assessment details, click on the arrows below"),
+              SelectableText("\nBut be sure to head to the directory page and 'create a family member', as this"),
+              SelectableText("will gather your information and add you to the Teague Family Directory, which is"),
+              SelectableText("necessary in order to pay for the assessment."),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ElevatedButton(onPressed: () {navigate(1);}, child: Text("Directory")),
+              )
+              // Text(
+              //   "\nFor this year, the reunion will be held at the\nRiver Walk in San Antonio, Texas"
+              //   + "\n\nClick the arrows to see more info on the hotel,\nthe activities list, and the assessment info.\n"
+              //   + '\nBut before you continue, please be sure to register your information\nby going to the directory tab'
+              //   + ' and "creating a family member",\nThis will add you to the Teague Family Directory and\nmust be done in order to pay for the assessment.\n\n',
+              //   textAlign: TextAlign.center,
+              // ),
+            ]
           ),
         ),
       ),
@@ -74,12 +101,12 @@ class HotelSlide extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
+              SelectableText(
                 "Springhill Suites Hotel",
                 textAlign: TextAlign.center,
                 style: TextStyle(decoration: TextDecoration.underline),
               ),
-              Text(
+              SelectableText(
                 "\nSpringhill Suites by Marriot has agreed to reserve several rooms\nat a rate of \$129 plus tax per night from July 29 to 31, 2022"
                 + "\n\nAddress: 524 South Saint Mary’s Street\nSan Antonio, Texas 78205\n\nCall here to book: (210)354-1333\nBe sure to mention the event is Teague Family Reunion",
                 textAlign: TextAlign.center,
@@ -114,25 +141,185 @@ class ActivitiesSlide extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              SelectableText(
                 "San Antonio Activities",
                 textAlign: TextAlign.center,
                 style: TextStyle(decoration: TextDecoration.underline),
               ),
-              Text(
-                "\nRiver Walk Boat Ride - \$13.50 / ages 1-5 \$7.50 / ages 65+ \$10.50,\nThe Alamo Tour - FREE,\nSix Flags - \$29.99 (online ticket price),\n" +
-                "Sea World - \$54.99 (must reserve ahead),\nAquatica - \$39.99 (must reserve ahead)," +
-                "\nSplashtown Waterpark - under 48\" \$29.99 / Adults \$34.99,\nExtreme Escape (Colonnade) - \$31.99 (must reserve ahead),\n" 
-                "San Antonio Zoo - ages 3-11 \$25.99 / ages 12+ \$29.99,\nDouble Decker Bus Tour - \$37.89,\nShopping at San Marcos Outlet or The Shops at La Contera,"
-                "\n"
-                "Ripley's Believe it or Not (4D Movie Theater):",
+              SelectableText.rich(
+                TextSpan(children: [
+                  TextSpan(
+                    text: '\nRiver Walk Boat Ride',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://google.com");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - \$13.50 / ages 1-5 \$7.50 / ages 65+ \$10.50,\n"
+                  ),
+                  TextSpan(
+                    text: "The Alamo Tour",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://google.com");
+                    }
+                  ),
+                  TextSpan(
+                    text: "  - FREE,\n"
+                  ),
+                  TextSpan(
+                    text: "Six Flags",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://www.sixflags.com/fiestatexas/store/tickets#!");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - \$29.99 (online ticket price),\n"
+                  ),
+                  TextSpan(
+                    text: "Sea World",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://seaworld.com/san-antonio");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - \$54.99 (must reserve ahead),\n"
+                  ),
+                  TextSpan(
+                    text: "Aquatica",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://google.com");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - \$39.99 (must reserve ahead),\n"
+                  ),
+                  TextSpan(
+                    text: "Splashtown Waterpark",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://www.splashtownsa.com/");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - under 48\" \$29.99 / Adults \$34.99,\n"
+                  ),
+                  TextSpan(
+                    text: "Extreme Escape (Colonnade)",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://www.extremeescape.com/colonnade");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - \$31.99 (must reserve ahead),\n"
+                  ),
+                  TextSpan(
+                    text: "San Antonio Zoo",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://sazoo.org/experiences/");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - ages 3-11 \$25.99 / ages 12+ \$29.99,\n"
+                  ),
+                  TextSpan(
+                    text: "Double Decker Bus Tour",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://www.citysightseeingsanantonio.com/en/hop-on-hop-off-24");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - \$37.89,\n"
+                  ),
+                  TextSpan(
+                    text: "Natural Bridge Caverns",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://naturalbridgecaverns.com/");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - Free,\n"
+                  ),
+                  TextSpan(
+                    text: "Ripley's Believe it or Not (4D Movie Theater)",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800
+                    ),
+                    recognizer: new TapGestureRecognizer()
+                      ..onTap = () {
+                        launch("https://www.ripleys.com/sanantonio/attractions/moving-theater/");
+                    }
+                  ),
+                  TextSpan(
+                    text: " - ages 3 - 11 \$8.99 (must be over 43\") / ages 12+ \$14.99,\n"
+                  ),
+                  TextSpan(
+                    text: "Shopping at San Marcos Outlet or The Shops at La Contera\n"
+                  ),  
+              ]),
                 textAlign: TextAlign.left,
               ),
-              Text(
-                "ages 3 - 11 \$8.99 (must be over 43\") / ages 12+ \$14.99\n\n",
-                textAlign: TextAlign.center
-              ),
-              ElevatedButton(onPressed: () { navigate(2); }, child: Text("Vote!"))
+              ElevatedButton(onPressed: () { navigate(2); }, child: Text("Vote For Your Favorites!"))
             ],
           ),
         ),

@@ -101,7 +101,7 @@ class FamilyMember{
       'state': member.location.state, 
       'city': member.location.city
     };
-    // object['phone'] = member.phone;
+    object['phone'] = member.phone;
     object['dob'] = member.dob.millisecondsSinceEpoch;
 
     return object;
@@ -116,11 +116,13 @@ class FamilyMember{
       object['location']['state'],
       object['location']['city']
     );
-    // if()
-    // String phone = object['phone'];
+    String phone = object['phone'];
     DateTime dob = DateTime.fromMillisecondsSinceEpoch(object['dob']);
 
-    return FamilyMember(name, email, location, dob); 
+    FamilyMember ret = FamilyMember(name, email, location, dob);
+    ret.addPhone(phone);
+
+    return ret; 
 
   }
 

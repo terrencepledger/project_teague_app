@@ -1,5 +1,6 @@
 
 import 'package:firebase/firebase.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
@@ -24,6 +25,7 @@ class _ActivitiesPage extends State<ActivitiesPage> {
 
   SignIn signIn;
   DatabaseReference ref;
+
   List<PollOptions> items = [
     PollOptions('Riverwalk Boat Ride', Activity.Riverwalk),
     PollOptions('Almao Tour', Activity.Alamo),
@@ -45,6 +47,8 @@ class _ActivitiesPage extends State<ActivitiesPage> {
   }
 
   Widget poll() {
+
+    Widget x = Container();
 
     Widget show() {
       final pollKey = GlobalKey<PollState>();
@@ -69,19 +73,23 @@ class _ActivitiesPage extends State<ActivitiesPage> {
 
     if(signIn.currentUser != null)
     {
-      return show();
+      x = show();
     }
     else {
-      return Padding(
+      x = Padding(
         padding: const EdgeInsets.only(top: 18.0),
         child: Card(
           child: Column(
             children: [
               SelectableText("Must sign in to your primary google account"),
               SignInButton(
-                Buttons.GoogleDark, onPressed: () {
-                  SignIn();
-                  setState(() {});
+                Buttons.GoogleDark, onPressed: () async {
+                  await signIn.handleSignIn();
+                  if(signIn.currentUser != null) {
+                    setState(() {
+                      x = show(); 
+                    });
+                  }
                 },
               )
             ]
@@ -89,6 +97,9 @@ class _ActivitiesPage extends State<ActivitiesPage> {
         ),
       );
     }
+
+    return x;
+
   }
 
   @override
@@ -100,24 +111,18 @@ class _ActivitiesPage extends State<ActivitiesPage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // SelectableText(
-              //   "San Antonio Activities",
-              //   textAlign: TextAlign.center,
-              //   style: TextStyle(decoration: TextDecoration.underline),
-              // ),
-              // SelectableText(
-              //   "\nRiver Walk Boat Ride - \$13.50 / ages 1-5 \$7.50 / ages 65+ \$10.50,\nThe Alamo Tour - FREE,\nSix Flags - \$29.99 (online ticket price),\n" +
-              //   "Sea World - \$54.99 (must reserve ahead),\nAquatica - \$39.99 (must reserve ahead)," +
-              //   "\nSplashtown Waterpark - under 48\" \$29.99 / Adults \$34.99,\nExtreme Escape (Colonnade) - \$31.99 (must reserve ahead),\n" 
-              //   "San Antonio Zoo - ages 3-11 \$25.99 / ages 12+ \$29.99,\nDouble Decker Bus Tour - \$37.89,\nShopping at San Marcos Outlet or The Shops at La Contera,"
-              //   "\n"
-              //   "Ripley's Believe it or Not (4D Movie Theater):",
-              //   textAlign: TextAlign.left,
-              // ),
-              // SelectableText(
-              //   "ages 3 - 11 \$8.99 (must be over 43\") / ages 12+ \$14.99",
-              //   textAlign: TextAlign.center
-              // ),
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0, left: 8, right: 8, bottom: 8),
+                child: SelectableText(
+                  "There are a lot of FUN things to do in San Antonio and we've compiled a list of activities. "
+                  + "Please note all prices listed are the current 2021 prices and are SUBJECT TO CHANGE for 2022. "
+                  + "Since this is our FAMILY REUNION, and we'd be able to get group rate discounts, we would like to do some of the activities as a group. "
+                  + "With that in mind we are asking everyone to select their top (4) choices and the ones with the most votes will be the activities we do as a group."
+                  + " Select from the following list, and then click the submit button below to view the results.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
               poll()
             ],
           ),
@@ -156,8 +161,12 @@ class PollState extends State<Poll> {
   PollState(this.items, this.owner, this.userId) {
     this.items = items;
     ref = database().ref('results');
+    ref.once('value').then(
+      (query) {
+        if(query.snapshot.val()[userId] != null) {updateData();}
+      }
+    );
     initItems();
-    updateData();
   }
 
   void update(List<PollOptions> items) {
@@ -169,6 +178,7 @@ class PollState extends State<Poll> {
 
   void updateData() {
 
+    print("HELLO");
     Map<Activity, int> data = Map.fromIterable(Activity.values,
       key: (activity) => activity,
       value: (activity) => 0
@@ -213,6 +223,8 @@ class PollState extends State<Poll> {
     ref.child(userId).set(selection);
 
     updateData();
+
+    reset();
 
   }
 

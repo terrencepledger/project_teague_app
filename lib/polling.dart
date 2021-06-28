@@ -73,14 +73,14 @@ class _PollOptionsState extends State<PollOptions> {
         style: ElevatedButton.styleFrom(
           primary: Colors.white,
         ),
-        onPressed: isDisabled ? null : () { onClick.call(); setState(() { isDisabled = true; buttonColor = Colors.green; });},
+        onPressed: isDisabled ? null : () { onClick.call(); setState(() { isDisabled = true; buttonColor = Colors.green;});},
         child: LinearPercentIndicator(
           animation: true,
           lineHeight: 35.0,
           animationDuration: 0,
           percent: percentage,
           alignment: MainAxisAlignment.start,
-          center: Align(alignment: Alignment.centerLeft, child: SelectableText(title, textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),)),
+          center: Align(alignment: Alignment.centerLeft, child: Text(title, textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),)),
           linearStrokeCap: LinearStrokeCap.roundAll,
           progressColor: buttonColor,
         ),

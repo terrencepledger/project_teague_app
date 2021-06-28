@@ -6,15 +6,15 @@ HomePage:
     ✔ Add Vote for Activities Button @done (6/17/2021, 6:48:27 PM)
     ✔ Add Polls dialogue @done (6/20/2021, 2:35:35 PM)
     ✔ Links to poll choices @done (6/25/2021, 1:35:40 PM)
-    ☐ Change Click Here text on purchase tickets popup
+    ✔ Change Click Here text on purchase tickets popup @done (6/25/2021, 11:31:45 PM)
     ☐ Add incomplete alert on create members popup
-    ☐ Change age to dob and add calendar input 
-    ☐ Automatically add created members to popup
+    ✔ Change age to dob and add calendar input @done (6/25/2021, 11:31:49 PM)
+    ✔ Automatically add created members to popup @done (6/25/2021, 11:31:51 PM)
     ☐ Add Tshirts slide
 ActivitiesPage:
     ✔ Create @done (6/25/2021, 1:35:35 PM) 
 PaymentPage:
-    ☐ Create
+    ✔ Create @done (6/25/2021, 11:31:39 PM)
 MemoriesPage:
     ☐ Create @low 
 InfoPages:

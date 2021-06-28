@@ -1,8 +1,10 @@
 
 import 'package:csc_picker/csc_picker.dart';
 import 'package:firebase/firebase.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:project_teague_app/signIn.dart';
 
@@ -57,242 +59,255 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   }
 
-  bool valid(List row) {
-
-    return true;
-
-  }
-
   void showCreateMembers() {
 
-      List<TextEditingController> names = [];
-      List<TextEditingController> emails = [];
-      List<Location> locations = [];
-      List<DateTime> dobs = [];
+    TextEditingController name = TextEditingController();
+    TextEditingController email = TextEditingController();
+    TextEditingController number = TextEditingController();
+    Location location = Location("", "");
+    DateTime dob;
 
-      Widget locationPicker(int index) {
+    bool valid() {
 
-        return Center(
-          child: Container(
-            decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
-            padding: EdgeInsets.all(20),
-            child: CSCPicker(
-              showStates: true,
-
-              showCities: true,
-
-              flagState: CountryFlag.DISABLE,
-
-              dropdownDecoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.white,
-                border:
-                    Border.all(color: Colors.grey.shade300, width: 1)
-              ),
-
-              disabledDropdownDecoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: Colors.grey.shade300,
-                border:
-                    Border.all(color: Colors.grey.shade300, width: 1)
-              ),
-
-              defaultCountry: DefaultCountry.United_States,
-
-              selectedItemStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-              ),
-
-              dropdownHeadingStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 17,
-                fontWeight: FontWeight.bold
-              ),
-
-              dropdownItemStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-              ),
-
-              dropdownDialogRadius: 10.0,
-
-              searchBarRadius: 10.0,
-
-              onStateChanged: (value) {
-                setState(() {
-                  locations[index].state = value;
-                });
-              },
-
-              onCityChanged: (value) {
-                setState(() {
-                  locations[index].city = value;  
-                });
-              },
-
-              onCountryChanged: (val) {},
-
-            )
-          ),
-        );
-
+      if(name.text != null && email.text != null && location.state != null && location.city != null
+        && number != null && dob != null
+      )
+        return true;
+      else {
+        return false;      
       }
 
-      Future<void> selectDOB(Function setState, int index) async {
-        print("inside");
-        final DateTime picked = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          lastDate: DateTime.now(),
-          firstDate: DateTime.fromMicrosecondsSinceEpoch(0)
-        );
-        print(picked);
-        DateTime now = new DateTime.now();
-        DateTime today = new DateTime(now.year, now.month, now.day);
-        if (picked != null && picked != today) {
-          print("doubly inside");
-          setState(() {
-            dobs[index] = picked;
-          });
-        }
-        print("complete");
-        print(picked);
-      }
+    }
 
-      Widget inputRow(Function setState2) { 
-        names.add(TextEditingController());
-        emails.add(TextEditingController());
-        locations.add(Location("", ""));
-        dobs.add(null);
-        return StatefulBuilder(builder: (context, setState) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: TextFormField(
-                    controller: names.last,
-                    style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
-                    decoration: InputDecoration(
-                      labelText: "Full Name"
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    controller: emails.last,
-                    style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: "Email"
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: locationPicker(locations.length - 1),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: () {selectDOB(setState, dobs.length - 1);}, 
-                    child: Text((dobs.last == null) ? "Enter Date of Birth" : DateFormat('MM/dd/yyyy').format(dobs.last))
-                  ),
-                ),
-              ),
-            ],
-          );
-        });
-      }
+    Future showAlertDialog(BuildContext context2) {
 
-      List<Widget> inputRows = [];
+      String error = "";
 
-      showDialog(context: context, builder: 
-        (buildContext) {
-          return StatefulBuilder(builder: (context, setState2) {
-            inputRows.length < 1 ? inputRows.add(inputRow(setState2)) : null;
-            return AlertDialog(
-              content: Container(
-                constraints: BoxConstraints(
-                  minWidth: 650
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(inputRows.length, (index) => inputRows.elementAt(index)) +
-                  [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: IconButton(icon: Icon(
-                        Icons.add_circle_outline
-                      ), onPressed: () {
-                        setState(
-                          () {
-                            inputRows.add(inputRow(setState2));  
-                          }
-                        );
-                      }),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          List<FamilyMember> membersToAdd = [];
-                          for (var i = 0; i < names.length; i++) {
-                            List row = [names.elementAt(i), emails.elementAt(i),
-                                  locations.elementAt(i), dobs.elementAt(i)];
-                            if(valid(row)) {
-                              membersToAdd.add(
-                                FamilyMember(names.elementAt(i).text, emails.elementAt(i).text,
-                                  locations.elementAt(i), dobs.elementAt(i))
-                              );
-                            }
-                          }
-                          membersToAdd.forEach(
-                            (member) {
-                              setState(() {
-                                member.id = famRef.push(FamilyMember.toMap(member)).key;
-                                choices.add(member);
-                                selected[member] = true;
-                              });
-                            }
-                          );
-                          Navigator.of(context).pop();
-                        }, 
-                        child: Text("Submit")
-                      ),
-                    )
-                  ]
-                ),
-              ),
-            );
-          });
-        }  
+      if(number.text.length != 9)
+        error += "Please enter a valid phone number\n";
+      if(!email.text.contains("@"))
+        error += "Please enter a valid email address\n";
+      else
+        error += "To submit a new member, all fields must be entered. Please fill in all fields and submit again.";
+
+      // set up the button
+      Widget okButton = TextButton(
+        child: Text("OK"),
+        onPressed: () { Navigator.pop(context2); },
+      );
+
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text("Create Member Error"),
+        content: Text(
+          error, style: TextStyle(color: Colors.black),
+        ),
+        actions: [
+          okButton,
+        ],
+      );
+
+      // show the dialog
+      return showDialog(
+        context: context2,
+        builder: (BuildContext context2) {
+          return alert;
+        },
       );
 
     }
 
-  Widget paymentWidget() {
-    
-    showDialog(context: context, 
-      builder: (buildContext) {
-        
-        return StatefulBuilder(builder: (context, setState) {
-          
-          
-        
+    Future<void> selectDOB(Function setState) async {
+      final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        lastDate: DateTime.now(),
+        firstDate: DateTime.fromMillisecondsSinceEpoch(-2208967200000)
+      );
+      DateTime now = new DateTime.now();
+      DateTime today = new DateTime(now.year, now.month, now.day);
+      if (picked != null && picked != today) {
+        setState(() {
+          dob = picked;
         });
-        
       }
+    }
 
+    Widget locationPicker(Function setState) {
+
+      return Center(
+        child: Container(
+          decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
+          padding: EdgeInsets.all(20),
+          child: CSCPicker(
+            showStates: true,
+
+            showCities: true,
+
+            flagState: CountryFlag.DISABLE,
+
+            dropdownDecoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              color: Colors.white,
+              border:
+                  Border.all(color: Colors.grey.shade300, width: 1)
+            ),
+
+            disabledDropdownDecoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              color: Colors.grey.shade300,
+              border:
+                  Border.all(color: Colors.grey.shade300, width: 1)
+            ),
+
+            defaultCountry: DefaultCountry.United_States,
+
+            selectedItemStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+            ),
+
+            dropdownHeadingStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 17,
+              fontWeight: FontWeight.bold
+            ),
+
+            dropdownItemStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+            ),
+
+            dropdownDialogRadius: 10.0,
+
+            searchBarRadius: 10.0,
+
+            onStateChanged: (value) {
+              setState(() {
+                location.state = value;
+              });
+            },
+
+            onCityChanged: (value) {
+              setState(() {
+                location.city = value;  
+              });
+            },
+
+            onCountryChanged: (val) {},
+
+          )
+        ),
+      );
+
+    }
+
+    showDialog(context: context, builder: 
+      (buildContext) {
+        return StatefulBuilder(builder: (context, setState2) {
+          return AlertDialog(
+            content: Container(
+              constraints: BoxConstraints(
+                minWidth: 650
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [ 
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: TextFormField(
+                            controller: name,
+                            style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
+                            decoration: InputDecoration(
+                              labelText: "Full Name"
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            controller: email,
+                            style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: "Email"
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          controller: number,
+                          decoration: InputDecoration(
+                            labelText: "Phone Number"
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]+')),],
+                          style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: locationPicker(setState),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            onPressed: () {selectDOB(setState2);}, 
+                            child: Text((dob == null) ? "Enter Date of Birth" : DateFormat('MM/dd/yyyy').format(dob))
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0, right: 4),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            List<FamilyMember> membersToAdd = [];
+                            if(valid()) {
+                              membersToAdd.add(
+                                FamilyMember(name.text, email.text, location, dob)
+                              );
+                              membersToAdd.forEach(
+                                (member) {
+                                  setState(() {
+                                    member.id = famRef.push(FamilyMember.toMap(member)).key;
+                                    member.addPhone(number.text);
+                                    choices.add(member);
+                                    selected[member] = true;
+                                  });
+                                }
+                              );
+                              Navigator.of(context).pop();
+                            }
+                            else
+                            {
+                              showAlertDialog(context);
+                            }
+                          }, 
+                          child: Text("Submit")
+                        ),
+                      ),
+                    ],
+                  ),
+                ]
+              ),
+            ),
+          );
+        });
+      }  
     );
 
   }
@@ -310,7 +325,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               children: [
                 ElevatedButton(
                   onPressed: () => showCreateMembers(),
-                  child: Text("Add Family Members")
+                  child: Text("Create Family Member")
                 )
               ], 
             ),
@@ -342,7 +357,9 @@ class _PaymentsPage extends State<PaymentsPage> {
                 Expanded(
                   child: Align(
                     alignment: Alignment.bottomCenter,
-                    child: SelectableText("Total: \$${(selected.entries.where((element) => element.value).toList().length * 3).toStringAsFixed(2)}")
+                    child: SelectableText("Total: \$${(selected.entries.where((element) => element.value).toList().length * 3).toStringAsFixed(2)}",
+                      style: TextStyle(fontSize: 20),
+                    )
                   ),
                 ),
                 Align(

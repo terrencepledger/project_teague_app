@@ -38,7 +38,7 @@ class _HomePage extends State<HomePage> {
 
     setState(() {
       items.addAll([
-        CarouselItem(OverviewSlide(), sliderController),
+        CarouselItem(OverviewSlide(navigate), sliderController),
         CarouselItem(HotelSlide(), sliderController),
         CarouselItem(ActivitiesSlide(navigate), sliderController)
       ]);    

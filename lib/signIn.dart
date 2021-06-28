@@ -19,7 +19,6 @@ class SignIn {
 
   SignIn() {
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-      currentUser = account;
       if (currentUser != null) {
         if(_listener != null) {
           _listener.call(currentUser.displayName);
@@ -27,14 +26,16 @@ class SignIn {
         }
       }
     });
-    _handleSignIn();
+    handleSignIn();
     // _googleSignIn.signInSilently();
 
   }
 
-  Future<void> _handleSignIn() async {
+  Future<void> handleSignIn() async {
     try {
       await _googleSignIn.signIn();
+      currentUser = _googleSignIn.currentUser;
+      // _listener.call(currentUser.displayName);
     } catch (error) {
       print(error);
     }

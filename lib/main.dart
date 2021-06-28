@@ -50,6 +50,8 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
 
+  int current = 0;
+
   SignIn signIn;
   String displayName = "";
 
@@ -73,6 +75,13 @@ class _AppState extends State<App> {
   }
 
   void navigate(int page) {
+
+    if(page == current) {
+      return;
+    }
+    else{
+      current = page;
+    }
 
     Widget x;
     String y;
