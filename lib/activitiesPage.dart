@@ -7,6 +7,8 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:project_teague_app/polling.dart';
 import 'package:project_teague_app/signIn.dart';
 
+import 'Objects.dart';
+
 class ActivitiesPage extends StatefulWidget {
 
   SignIn signIn;
@@ -38,6 +40,8 @@ class _ActivitiesPage extends State<ActivitiesPage> {
     PollOptions("Ripley's Believe It or Not", Activity.Ripleys),
     PollOptions('Splashtown Waterpark', Activity.Splashtown),
     PollOptions('Extreme Escape', Activity.Escape),
+    PollOptions('Aquatica', Activity.Aquatica),
+    PollOptions('Shopping', Activity.Shopping),
   ];
 
   _ActivitiesPage(SignIn signIn) {
@@ -120,7 +124,7 @@ class _ActivitiesPage extends State<ActivitiesPage> {
                   + "With that in mind we are asking everyone to select their top (4) choices and the ones with the most votes will be the activities we do as a group."
                   + " Select from the following list, and then click the submit button below to view the results.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
               poll()
@@ -178,7 +182,6 @@ class PollState extends State<Poll> {
 
   void updateData() {
 
-    print("HELLO");
     Map<Activity, int> data = Map.fromIterable(Activity.values,
       key: (activity) => activity,
       value: (activity) => 0

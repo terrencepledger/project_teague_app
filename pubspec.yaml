@@ -44,6 +44,10 @@ dependencies:
   csc_picker: ^0.2.5
   url_launcher: ^6.0.7
   intl: ^0.17.0
+  http_auth: ^1.0.0
+  universal_html: ^2.0.8
+  age: ^0.0.1
+  flutter_search_panel: ^1.0.1
 
 dev_dependencies:
   flutter_test:

@@ -1,13 +1,8 @@
-import 'dart:convert';
-
 import 'package:google_sign_in/google_sign_in.dart';
-import "package:http/http.dart" as http;
 
 class SignIn {
 
   GoogleSignIn _googleSignIn = GoogleSignIn(
-    // Optional clientId
-    // clientId: '479882132969-9i9aqik3jfjd7qhci1nqf0bm2g71rm1u.apps.googleusercontent.com',
     scopes: <String>[
       'email',
       'https://www.googleapis.com/auth/contacts.readonly',
@@ -18,6 +13,7 @@ class SignIn {
   Function _listener;
 
   SignIn() {
+
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
       if (currentUser != null) {
         if(_listener != null) {
@@ -26,6 +22,7 @@ class SignIn {
         }
       }
     });
+
     handleSignIn();
     // _googleSignIn.signInSilently();
 
@@ -37,11 +34,10 @@ class SignIn {
       currentUser = _googleSignIn.currentUser;
       // _listener.call(currentUser.displayName);
     } catch (error) {
-      print(error);
     }
   }
 
-  Future<void> _handleSignOut() => _googleSignIn.disconnect();
+  Future<void> handleSignOut() => _googleSignIn.disconnect();
 
   void listener(Function func) {
     if(currentUser != null)

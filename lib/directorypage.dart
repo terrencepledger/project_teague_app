@@ -31,16 +31,18 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
   void loadMembers() {
     
-    famRef.once('value').then((query) {
-      
-      query.snapshot.forEach((child){
-        FamilyMember member = FamilyMember.toMember(child.val());
-        member.id = child.key;
+    famRef.once('value').then((query) async {
+      List temp = [];
+      query.snapshot.forEach((child) {
+        temp.add(child);
+      }); 
+      for (var item in temp) {
+        FamilyMember member = await FamilyMember.toMember(item.val());
+        member.id = item.key;
         setState(() {
           members.add(member);
         });
-      }); 
-
+      }
     });
 
   }
@@ -56,7 +58,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
     bool valid() {
 
       if(name.text != null && email.text != null && location.state != null && location.city != null
-        && dob != null
+        && dob != null && number.text.length == 10
       )
         return true;
       else {
@@ -69,7 +71,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
       String error = "";
 
-      if(number.text.length != 9)
+      if(number.text.length != 10)
         error += "Please enter a valid phone number\n";
       if(!email.text.contains("@"))
         error += "Please enter a valid email address\n";
@@ -268,8 +270,8 @@ class _DirectoryPageState extends State<DirectoryPage> {
                               );
                               membersToAdd.forEach(
                                 (member) {
-                                  member.id = famRef.push(FamilyMember.toMap(member)).key;
                                   member.addPhone(number.text);
+                                  member.id = famRef.push(FamilyMember.toMap(member)).key;
                                 }
                               );
                               setState(() {
@@ -320,52 +322,74 @@ class _DirectoryPageState extends State<DirectoryPage> {
             ),
           ),
         ),
-        ElevatedButton(
-          onPressed: () => showCreateMembers(),
-          child: Text("Create Family Member")
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: ElevatedButton(
+            onPressed: () => showCreateMembers(),
+            child: Text("Create Family Member")
+          ),
         ),
         Expanded(
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: members.length,
             itemBuilder: (context, index) {
+              members.sort((a, b) => a.name.split(" ").last.compareTo(b.name.split(' ').last));
               if (searchController.text.isEmpty) {
-                return Row(
-                  children: [
-                    MyBullet(),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: SelectableText(members.elementAt(index).displayInfo(), style: Theme.of(context).textTheme.headline5,),
-                    ),
-                    // Expanded(
-                    //   child: Align(
-                    //     child: IconButton(onPressed: () {print("Edit ${members[index].name}");}, icon: Icon(Icons.edit)),
-                    //     alignment: Alignment.centerRight,
-                    //   )
-                    // )
-                  ]
-                );} 
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    direction: Axis.horizontal,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MyBullet(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SelectableText(members.elementAt(index).allInfo(), style: Theme.of(context).textTheme.headline5,),
+                      ),
+                      // Expanded(
+                      //   child: Align(
+                      //     child: IconButton(onPressed: () {print("Edit ${members[index].name}");}, icon: Icon(Icons.edit)),
+                      //     alignment: Alignment.centerRight,
+                      //   )
+                      // )
+                    ]
+                  ),
+                );
+              } 
               else if (members[index].allInfo().toLowerCase()
                 .contains(searchController.text.toLowerCase()) ||
                 members[index].allInfo().toLowerCase()
                 .contains(searchController.text.toLowerCase())
               ) {
-                return Row(
-                  children: [
-                    MyBullet(),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: SelectableText(members.elementAt(index).allInfo(), style: Theme.of(context).textTheme.headline5,),
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MyBullet(),
                       ),
-                    ),
-                    // Expanded(
-                    //   child: Align(
-                    //     child: IconButton(onPressed: () {print("Edit ${members[index].name}");}, icon: Icon(Icons.edit)),
-                    //     alignment: Alignment.centerRight,
-                    //   )
-                    // )
-                  ]
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: SelectableText(members.elementAt(index).allInfo(), style: Theme.of(context).textTheme.headline5,),
+                          ),
+                        ),
+                      ),
+                      // Expanded(
+                      //   child: Align(
+                      //     child: IconButton(onPressed: () {print("Edit ${members[index].name}");}, icon: Icon(Icons.edit)),
+                      //     alignment: Alignment.centerRight,
+                      //   )
+                      // )
+                    ]
+                  ),
                 );
               } else {
                 return Container();

@@ -3,7 +3,6 @@ import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:project_teague_app/Objects.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:project_teague_app/infoPages.dart';
 import 'package:project_teague_app/signIn.dart';
 
@@ -25,16 +24,12 @@ class _HomePage extends State<HomePage> {
   Function navigate;
   List<Widget> items = [];
   CarouselController sliderController = CarouselController();
-  DatabaseReference ref;
 
   _HomePage(this.signIn, this.navigate);
 
   @override
   void initState() { 
     super.initState();
-
-    Database db = database();
-    ref = db.ref('users');
 
     setState(() {
       items.addAll([

@@ -1,9 +1,7 @@
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -14,7 +12,7 @@ class UrlLauncher {
   static Widget tryLaunch(String text, String url) {
 
     void _launch() async {
-      await canLaunch(url) ? await launch(url) : print("cant launch");
+      await canLaunch(url) ? await launch(url) : print("cant launch $url");
 
     }
 
@@ -63,16 +61,9 @@ class OverviewSlide extends StatelessWidget {
               SelectableText("will gather your information and add you to the Teague Family Directory, which is"),
               SelectableText("necessary in order to pay for the assessment."),
               Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.only(top: 20.0),
                 child: ElevatedButton(onPressed: () {navigate(1);}, child: Text("Directory")),
               )
-              // Text(
-              //   "\nFor this year, the reunion will be held at the\nRiver Walk in San Antonio, Texas"
-              //   + "\n\nClick the arrows to see more info on the hotel,\nthe activities list, and the assessment info.\n"
-              //   + '\nBut before you continue, please be sure to register your information\nby going to the directory tab'
-              //   + ' and "creating a family member",\nThis will add you to the Teague Family Directory and\nmust be done in order to pay for the assessment.\n\n',
-              //   textAlign: TextAlign.center,
-              // ),
             ]
           ),
         ),
@@ -136,17 +127,21 @@ class ActivitiesSlide extends StatelessWidget {
           end: Alignment.topLeft,
           colors: const [Colors.lightBlueAccent, Colors.white30, Colors.white30, Colors.lightBlueAccent])),
       child: FittedBox(
+        // fit: BoxFit.cover,
         child: Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 30.0),
+          padding: const EdgeInsets.only(left: 15, top: 10, bottom: 10.0, right: 15),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SelectableText(
-                "San Antonio Activities",
-                textAlign: TextAlign.center,
-                style: TextStyle(decoration: TextDecoration.underline),
+              Align(
+                alignment: Alignment.topCenter,
+                child: SelectableText(
+                  "San Antonio Activities",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(decoration: TextDecoration.underline),
+                ),
               ),
-              SelectableText.rich(
+              Text.rich(
                 TextSpan(children: [
                   TextSpan(
                     text: '\nRiver Walk Boat Ride',
@@ -157,7 +152,7 @@ class ActivitiesSlide extends StatelessWidget {
                     ),
                     recognizer: new TapGestureRecognizer()
                       ..onTap = () {
-                        launch("https://google.com");
+                        launch("https://www.goriocruises.com/");
                     }
                   ),
                   TextSpan(
@@ -172,7 +167,7 @@ class ActivitiesSlide extends StatelessWidget {
                     ),
                     recognizer: new TapGestureRecognizer()
                       ..onTap = () {
-                        launch("https://google.com");
+                        launch("https://www.thealamo.org/");
                     }
                   ),
                   TextSpan(
@@ -217,7 +212,7 @@ class ActivitiesSlide extends StatelessWidget {
                     ),
                     recognizer: new TapGestureRecognizer()
                       ..onTap = () {
-                        launch("https://google.com");
+                        launch("https://seaworld.com/san-antonio/#:~:text=Watch%20Video-,Aquatica,-This%20tropical%20paradise");
                     }
                   ),
                   TextSpan(
@@ -296,7 +291,7 @@ class ActivitiesSlide extends StatelessWidget {
                     }
                   ),
                   TextSpan(
-                    text: " - Free,\n"
+                    text: " - Adult zip rails & rope course: \$26.99; Tykes zip rails & rope course: \$8.99; Maze: \$9.99; Climbing walls: \$9.99,\n"
                   ),
                   TextSpan(
                     text: "Ripley's Believe it or Not (4D Movie Theater)",
@@ -314,7 +309,8 @@ class ActivitiesSlide extends StatelessWidget {
                     text: " - ages 3 - 11 \$8.99 (must be over 43\") / ages 12+ \$14.99,\n"
                   ),
                   TextSpan(
-                    text: "Shopping at San Marcos Outlet or The Shops at La Contera\n"
+                    text: "Shopping at San Marcos Outlet or The Shops at La Contera\n",
+                    style: TextStyle(fontWeight: FontWeight.bold)
                   ),  
               ]),
                 textAlign: TextAlign.left,

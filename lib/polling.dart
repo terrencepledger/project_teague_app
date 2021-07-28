@@ -4,11 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
-enum Activity {
-  Riverwalk, Alamo, SixFlags, SeaWorld,
-  Caverns, Zoo, Bus, Shopping, Ripleys, 
-  Splashtown, Escape
-}
+import 'Objects.dart';
 
 class PollOptions extends StatefulWidget {
 
@@ -68,7 +64,7 @@ class _PollOptionsState extends State<PollOptions> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(6.0),
       child: TextButton(
         style: ElevatedButton.styleFrom(
           primary: Colors.white,
@@ -76,11 +72,11 @@ class _PollOptionsState extends State<PollOptions> {
         onPressed: isDisabled ? null : () { onClick.call(); setState(() { isDisabled = true; buttonColor = Colors.green;});},
         child: LinearPercentIndicator(
           animation: true,
-          lineHeight: 35.0,
+          lineHeight: 33.0,
           animationDuration: 0,
           percent: percentage,
           alignment: MainAxisAlignment.start,
-          center: Align(alignment: Alignment.centerLeft, child: Text(title, textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),)),
+          center: Align(alignment: Alignment.centerLeft, child: Text(title, textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),)),
           linearStrokeCap: LinearStrokeCap.roundAll,
           progressColor: buttonColor,
         ),
