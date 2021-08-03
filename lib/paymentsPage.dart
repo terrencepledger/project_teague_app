@@ -7,8 +7,6 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_search_panel/flutter_search_panel.dart';
-import 'package:flutter_search_panel/search_item.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:intl/intl.dart';
@@ -167,7 +165,9 @@ class _PaymentsPage extends State<PaymentsPage> {
   }
 
   void loadPage() async {
+
     List searchResults = choices;
+    
     showPurchasePage = StatefulBuilder(
       builder: (BuildContext context2, StateSetter setstate2) {
         return Padding(
@@ -258,60 +258,6 @@ class _PaymentsPage extends State<PaymentsPage> {
                     );
                   }
                 )
-                // ListView.builder(
-                //   shrinkWrap: true,
-                //   itemCount: choices.length,
-                //   itemBuilder: (context2, index) {
-                //     choices.sort((a, b) => a.name.split(" ").last.compareTo(b.name.split(' ').last));
-                //     // if () {
-                //     //   return Padding(
-                //     //     padding: const EdgeInsets.all(8.0),
-                //     //     child: Row(
-                //     //       mainAxisSize: MainAxisSize.min,
-                //     //       children: [
-                //     //         Padding(
-                //     //           padding: const EdgeInsets.all(8.0),
-                //     //           child: MyBullet(),
-                //     //         ),
-                //     //         Expanded(
-                //     //           child: Padding(
-                //     //             padding: const EdgeInsets.all(8.0),
-                //     //             child: Align(
-                //     //               alignment: Alignment.centerLeft,
-                //     //               child: CheckboxListTile(
-                //     //                 title: Text(choices.elementAt(index).displayInfo(), style: TextStyle(color: Colors.black),), 
-                //     //                 value: selected[choices.elementAt(index)],
-                //     //                 onChanged: (boolVal) 
-                //     //                 {
-                //     //                   setstate2(() {
-                //     //                     selected[choices.elementAt(index)] = boolVal;
-                //     //                   });
-                //     //                   if(boolVal) {
-                //     //                     items.addMember(choices.elementAt(index));
-                //     //                   }
-                //     //                   else {
-                //     //                     items.removeMember(choices.elementAt(index));
-                //     //                   }
-                //     //                 }
-                //     //               )
-                //     //             ),
-                //     //           ),
-                //     //         ),
-                //     //       ]
-                //     //     ),
-                //     //   );
-                //     // } 
-                //     // else 
-                //     if (searchController.text.isEmpty || choices[index].allInfo().toLowerCase()
-                //       .contains(searchController.text.toLowerCase()) ||
-                //       choices[index].allInfo().toLowerCase()
-                //       .contains(searchController.text.toLowerCase())
-                //     ) {
-                      
-                //     } else {
-                //       return Container();
-                //     }
-                //   }
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 25.0),
@@ -722,7 +668,20 @@ class _PaymentsPage extends State<PaymentsPage> {
         context: context,
         initialDate: DateTime.now(),
         lastDate: DateTime.now(),
-        firstDate: DateTime.fromMillisecondsSinceEpoch(-2208967200000)
+        firstDate: DateTime.fromMillisecondsSinceEpoch(-2208967200000),
+        builder: (BuildContext context, Widget child) {
+          print("YO");
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.fromSwatch(
+                primarySwatch: Colors.teal,
+                primaryColorDark: Colors.teal,
+                accentColor: Colors.teal,
+              ),        
+            ),
+            child: child
+          );
+        }
       );
       DateTime now = new DateTime.now();
       DateTime today = new DateTime(now.year, now.month, now.day);

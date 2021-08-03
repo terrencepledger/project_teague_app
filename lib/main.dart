@@ -299,7 +299,18 @@ class _AppState extends State<App> {
         context: context,
         initialDate: DateTime.now(),
         lastDate: DateTime.now(),
-        firstDate: DateTime.fromMillisecondsSinceEpoch(-2208967200000)
+        firstDate: DateTime.fromMillisecondsSinceEpoch(-2208967200000),
+        builder: (BuildContext context, Widget child) {
+          return Theme(
+            data: ThemeData.light().copyWith(
+              textSelectionTheme: ThemeData.light().textSelectionTheme.copyWith(
+                // selectionColor: Colors.black,
+                // selectionHandleColor: Colors.white
+              )       
+            ),
+            child: child
+          );
+        }
       );
       DateTime now = new DateTime.now();
       DateTime today = new DateTime(now.year, now.month, now.day);
