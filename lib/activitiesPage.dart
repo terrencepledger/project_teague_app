@@ -28,21 +28,9 @@ class _ActivitiesPage extends State<ActivitiesPage> {
   SignIn signIn;
   DatabaseReference ref;
 
-  List<PollOptions> items = [
-    PollOptions('Riverwalk Boat Ride', Activity.Riverwalk),
-    PollOptions('Almao Tour', Activity.Alamo),
-    PollOptions('Six Flags', Activity.SixFlags),
-    PollOptions('Sea World', Activity.SeaWorld),
-    PollOptions('Natural Bridge Caverns', Activity.Caverns),
-    PollOptions('San Antonio Zoo', Activity.Zoo),
-    PollOptions('Double Decker Bus Tour', Activity.Bus),
-    PollOptions('San Marcos Outlet', Activity.Shopping),
-    PollOptions("Ripley's Believe It or Not", Activity.Ripleys),
-    PollOptions('Splashtown Waterpark', Activity.Splashtown),
-    PollOptions('Extreme Escape', Activity.Escape),
-    PollOptions('Aquatica', Activity.Aquatica),
-    PollOptions('Shopping', Activity.Shopping),
-  ];
+  double fontSize;
+
+  Widget thePoll;
 
   _ActivitiesPage(SignIn signIn) {
 
@@ -50,12 +38,56 @@ class _ActivitiesPage extends State<ActivitiesPage> {
     
   }
 
-  Widget poll() {
+  List<PollOptions> checkSize() {
 
-    Widget x = Container();
+    print("inside check");
 
-    Widget show() {
-      final pollKey = GlobalKey<PollState>();
+    double _fontSize;
+    double _padding;
+
+    switch (getType(context)) {
+      case ScreenType.Desktop:
+        _fontSize = 18;
+        _padding = 8;
+        break;
+      case ScreenType.Tablet:
+        _fontSize = 15;
+        _padding = 2;
+        break;
+      default:
+        _fontSize = 12;
+        _padding = 0;
+    }
+
+    setState(() {
+      fontSize = _fontSize;
+    });
+
+    return [
+      PollOptions('Riverwalk Boat Ride', fontSize, _padding, Activity.Riverwalk),
+      PollOptions('Almao Tour', fontSize, _padding, Activity.Alamo),
+      PollOptions('Six Flags', fontSize, _padding, Activity.SixFlags),
+      PollOptions('Sea World', fontSize, _padding, Activity.SeaWorld),
+      PollOptions('Natural Bridge Caverns', fontSize, _padding, Activity.Caverns),
+      PollOptions('San Antonio Zoo', fontSize, _padding, Activity.Zoo),
+      PollOptions('Double Decker Bus Tour', fontSize, _padding, Activity.Bus),
+      PollOptions('San Marcos Outlet', fontSize, _padding, Activity.Shopping),
+      PollOptions("Ripley's Believe It or Not", fontSize, _padding, Activity.Ripleys),
+      PollOptions('Splashtown Waterpark', fontSize, _padding, Activity.Splashtown),
+      PollOptions('Extreme Escape', fontSize, _padding, Activity.Escape),
+      PollOptions('Aquatica', fontSize, _padding, Activity.Aquatica),
+      PollOptions('Shopping', fontSize, _padding, Activity.Shopping),
+    ];
+
+  }
+
+  void updatePoll() {
+    print("hey");
+
+    List<PollOptions> items = checkSize();
+
+    Widget poll() {
+      print("inside poll");
       return StatefulBuilder(builder: (context2, setState) {
           
         return Padding(
@@ -63,51 +95,63 @@ class _ActivitiesPage extends State<ActivitiesPage> {
           child: Column(
             children: [
               Poll(
-                key: pollKey,
                 items: items,
+                paddingSize: fontSize,
                 owner: "117585163810491599357",
-                userId: signIn.currentUser.id
+                userId: signIn.currentUser.id,
+                key: GlobalKey(),
               ),
             ],
           ),
         );
 
       });
+
     }
 
     if(signIn.currentUser != null)
     {
-      x = show();
+      setState(() {
+        thePoll = poll();
+      });
     }
     else {
-      x = Padding(
-        padding: const EdgeInsets.only(top: 18.0),
-        child: Card(
-          child: Column(
-            children: [
-              SelectableText("Must sign in to your primary google account"),
-              SignInButton(
-                Buttons.GoogleDark, onPressed: () async {
-                  await signIn.handleSignIn();
-                  if(signIn.currentUser != null) {
-                    setState(() {
-                      x = show(); 
-                    });
-                  }
-                },
-              )
-            ]
-          )
-        ),
-      );
+      setState(() {
+        thePoll = Padding(
+          padding: const EdgeInsets.only(top: 18.0),
+          child: Card(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SelectableText("Must sign in to your primary google account"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SignInButton(
+                    Buttons.GoogleDark, onPressed: () async {
+                      await signIn.handleSignIn();
+                      if(signIn.currentUser != null) {
+                        setState(() {
+                          thePoll = poll(); 
+                        });
+                      }
+                    },
+                  ),
+                )
+              ]
+            )
+          ),
+        );
+      });
     }
-
-    return x;
 
   }
 
   @override
   Widget build(BuildContext context) {
+
+    updatePoll();
 
     return SingleChildScrollView(
       child: Column(
@@ -116,7 +160,7 @@ class _ActivitiesPage extends State<ActivitiesPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 18.0, left: 8, right: 8, bottom: 8),
+                padding: const EdgeInsets.only(top: 18.0, left: 8, right: 8, bottom: 4),
                 child: SelectableText(
                   "There are a lot of FUN things to do in San Antonio and we've compiled a list of activities. "
                   + "Please note all prices listed are the current 2021 prices and are SUBJECT TO CHANGE for 2022. "
@@ -124,10 +168,10 @@ class _ActivitiesPage extends State<ActivitiesPage> {
                   + "With that in mind we are asking everyone to select their top (4) choices and the ones with the most votes will be the activities we do as a group."
                   + " Select from the following list, and then click the submit button below to view the results.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
                 ),
               ),
-              poll()
+              thePoll
             ],
           ),
         ],
@@ -144,8 +188,9 @@ class Poll extends StatefulWidget {
   List<PollOptions> items;
   String owner;
   String userId;
+  double paddingSize;
   
-  Poll({this.items, this.owner, this.userId, Key key}) : super(key: key);
+  Poll({this.items, this.paddingSize, this.owner, this.userId, Key key}) : super(key: key);
 
   @override
   State<Poll> createState() => PollState(items, owner, userId);
@@ -242,22 +287,24 @@ class PollState extends State<Poll> {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       child: Column(
         children: [
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: List.generate(
               items.length, (index) => items.elementAt(index)
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 35.0),
+            padding: EdgeInsets.only(top: widget.paddingSize),
             child: Row(
               children: [
                 Spacer(),
-                Expanded(child: SizedBox(height: 50, child: ElevatedButton(onPressed: selection.length == 0 ? null : () {submit();}, child: Text("Submit")))),
+                Expanded(child: SizedBox(height: 50, child: ElevatedButton(onPressed: selection.length == 0 ? null : () {submit();}, child: Text("Submit", style: TextStyle(fontSize: widget.paddingSize),)))),
                 Spacer(),
-                Expanded(child: SizedBox(height: 50, child: ElevatedButton(onPressed: selection.length == 0 ? null : () {reset();}, child: Text("Reset")))),
+                Expanded(child: SizedBox(height: 50, child: ElevatedButton(onPressed: selection.length == 0 ? null : () {reset();}, child: Text("Reset", style: TextStyle(fontSize: widget.paddingSize))))),
                 Spacer()
               ],
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -266,6 +313,7 @@ class PollState extends State<Poll> {
         ],
       ),
     );
+
   }
 
 }

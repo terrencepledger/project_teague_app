@@ -111,6 +111,8 @@ class _PaymentsPage extends State<PaymentsPage> {
             ),
           );
 
+          return false;
+
         } finally {
           
           ScaffoldMessenger.of(context).showSnackBar(
@@ -134,10 +136,10 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   void loadMembers() async {
     
-    // setState(() {
-    //   choices = [];
-    //   selected = {};
-    // });
+    setState(() {
+      choices = [];
+      selected = {};
+    });
 
     await ref.once('value').then((query) async {
       
@@ -583,16 +585,20 @@ class _PaymentsPage extends State<PaymentsPage> {
           child: Card(
             child: Column(
               children: [
-                SelectableText("Must sign in to your primary google account"),
-                SignInButton(
-                  Buttons.GoogleDark, onPressed: () async {
-                    await signIn.handleSignIn();
-                    if(signIn.currentUser != null) {
-                      loadMembers();
-                    }
-                    else
-                      print("else");
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SelectableText("Must sign in to your primary google account"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SignInButton(
+                    Buttons.GoogleDark, onPressed: () async {
+                      await signIn.handleSignIn();
+                      if(signIn.currentUser != null) {
+                        loadMembers();
+                      }
+                    },
+                  ),
                 )
               ]
             )
@@ -607,267 +613,23 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   void showCreateMembers() {
 
-    TextEditingController name = TextEditingController();
-    TextEditingController email = TextEditingController();
-    TextEditingController number = TextEditingController();
-    Location location = Location("", "");
-    DateTime dob;
-
-    bool valid() {
-
-      if(name.text != null && email.text != null && location.state != null && location.city != null
-        && number.text.length == 10 && dob != null
-      )
-        return true;
-      else {
-        return false;      
-      }
-
-    }
-
-    Future showAlertDialog(BuildContext context2) {
-
-      String error = "";
-
-      if(number.text.length != 10)
-        error += "Please enter a valid phone number\n";
-      if(!email.text.contains("@"))
-        error += "Please enter a valid email address\n";
-      else
-        error += "To submit a new member, all fields must be entered. Please fill in all fields and submit again.";
-
-      // set up the button
-      Widget okButton = TextButton(
-        child: Text("OK"),
-        onPressed: () { Navigator.pop(context2); },
+    CreateMemberPopup(context, setState, (name, email, number, location, dob) {
+      List<FamilyMember> membersToAdd = [];
+      membersToAdd.add(
+        FamilyMember(name.text, email.text, location, dob)
       );
-
-      // set up the AlertDialog
-      AlertDialog alert = AlertDialog(
-        title: Text("Create Member Error"),
-        content: Text(
-          error, style: TextStyle(color: Colors.black),
-        ),
-        actions: [
-          okButton,
-        ],
-      );
-
-      // show the dialog
-      return showDialog(
-        context: context2,
-        builder: (BuildContext context2) {
-          return alert;
-        },
-      );
-
-    }
-
-    Future<void> selectDOB(Function setState) async {
-      final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        lastDate: DateTime.now(),
-        firstDate: DateTime.fromMillisecondsSinceEpoch(-2208967200000),
-        builder: (BuildContext context, Widget child) {
-          print("YO");
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.fromSwatch(
-                primarySwatch: Colors.teal,
-                primaryColorDark: Colors.teal,
-                accentColor: Colors.teal,
-              ),        
-            ),
-            child: child
-          );
+      membersToAdd.forEach(
+        (member) {
+          setState(() {
+            member.addPhone(number.text);
+            member.id = ref.push(FamilyMember.toMap(member)).key;
+            choices.add(member);
+            selected[member] = true;
+          });
         }
       );
-      DateTime now = new DateTime.now();
-      DateTime today = new DateTime(now.year, now.month, now.day);
-      if (picked != null && picked != today) {
-        setState(() {
-          dob = picked;
-        });
-      }
-    }
-
-    Widget locationPicker(Function setState) {
-
-      return Center(
-        child: Container(
-          decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
-          padding: EdgeInsets.all(20),
-          child: CSCPicker(
-            showStates: true,
-
-            showCities: true,
-
-            flagState: CountryFlag.DISABLE,
-
-            dropdownDecoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.white,
-              border:
-                  Border.all(color: Colors.grey.shade300, width: 1)
-            ),
-
-            disabledDropdownDecoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.grey.shade300,
-              border:
-                  Border.all(color: Colors.grey.shade300, width: 1)
-            ),
-
-            defaultCountry: DefaultCountry.United_States,
-
-            selectedItemStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-            ),
-
-            dropdownHeadingStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 17,
-              fontWeight: FontWeight.bold
-            ),
-
-            dropdownItemStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-            ),
-
-            dropdownDialogRadius: 10.0,
-
-            searchBarRadius: 10.0,
-
-            onStateChanged: (value) {
-              setState(() {
-                location.state = value;
-              });
-            },
-
-            onCityChanged: (value) {
-              setState(() {
-                location.city = value;  
-              });
-            },
-
-            onCountryChanged: (val) {},
-
-          )
-        ),
-      );
-
-    }
-
-    showDialog(context: context, builder: 
-      (buildContext) {
-        return StatefulBuilder(builder: (context, setState2) {
-          return AlertDialog(
-            content: Container(
-              constraints: BoxConstraints(
-                minWidth: 650
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [ 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: TextFormField(
-                            controller: name,
-                            style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
-                            decoration: InputDecoration(
-                              labelText: "Full Name"
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            controller: email,
-                            style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: "Email"
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          controller: number,
-                          decoration: InputDecoration(
-                            labelText: "Phone Number"
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]+')),],
-                          style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: locationPicker(setState),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                            onPressed: () {selectDOB(setState2);}, 
-                            child: Text((dob == null) ? "Enter Date of Birth" : DateFormat('MM/dd/yyyy').format(dob))
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0, right: 4),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            List<FamilyMember> membersToAdd = [];
-                            if(valid()) {
-                              membersToAdd.add(
-                                FamilyMember(name.text, email.text, location, dob)
-                              );
-                              membersToAdd.forEach(
-                                (member) {
-                                  setState(() {
-                                    member.addPhone(number.text);
-                                    member.id = ref.push(FamilyMember.toMap(member)).key;
-                                    choices.add(member);
-                                    selected[member] = true;
-                                  });
-                                }
-                              );
-                              Navigator.of(context).pop();
-                            }
-                            else
-                            {
-                              showAlertDialog(context);
-                            }
-                          }, 
-                          child: Text("Submit")
-                        ),
-                      ),
-                    ],
-                  ),
-                ]
-              ),
-            ),
-          );
-        });
-      }  
-    );
+      Navigator.of(context).pop();
+    }).show();
 
   }
 
@@ -885,60 +647,6 @@ class _PaymentsPage extends State<PaymentsPage> {
       )
     );
 
-  }
-
-}
-
-class ListSearchDelegate extends SearchDelegate{
-
-  List listItems;
-
-  ListSearchDelegate(this.listItems, {Key key}): super();
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-
-    return [
-      IconButton(
-        icon: Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-      ),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-
-    List subList;
-
-    subList = query != '' ? listItems.where((item) => item.contains(query)).toList() : 
-      listItems ;
-
-    return ListView.builder(
-        itemCount: subList.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(subList[index]),
-          );
-        }
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return Container();
   }
 
 }

@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:project_teague_app/Objects.dart';
@@ -25,6 +24,8 @@ class _HomePage extends State<HomePage> {
   List<Widget> items = [];
   CarouselController sliderController = CarouselController();
 
+  double aspect;
+
   _HomePage(this.signIn, this.navigate);
 
   @override
@@ -33,17 +34,32 @@ class _HomePage extends State<HomePage> {
 
     setState(() {
       items.addAll([
-        CarouselItem(OverviewSlide(navigate), sliderController),
-        CarouselItem(HotelSlide(), sliderController),
-        CarouselItem(ActivitiesSlide(navigate), sliderController)
+        CarouselItem(OverviewSlide(context, navigate), sliderController),
+        CarouselItem(HotelSlide(context), sliderController),
+        CarouselItem(ActivitiesSlide(context, navigate), sliderController)
       ]);    
     }); 
 
   }
 
+  void checkAspect() {
+
+    switch (getType(context)) {
+      case ScreenType.Desktop:
+        aspect = 16/10;
+        break;
+      case ScreenType.Tablet:
+        aspect = 4/3;
+        break;
+      default:
+        aspect = 9/12;
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
-
+    checkAspect();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -54,7 +70,7 @@ class _HomePage extends State<HomePage> {
               items: items,
               carouselController: sliderController,
               options: CarouselOptions(
-                aspectRatio: 15/7,
+                aspectRatio: aspect,
                 enlargeCenterPage: true,
                 viewportFraction: 1,
               )
