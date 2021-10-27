@@ -21,6 +21,15 @@ enum InvoiceStatus {
 
 enum ScreenType { Watch, Handset, Tablet, Desktop }
 
+enum TshirtSize { 
+  Youth_XS, Youth_S, Youth_M, Youth_L, Youth_XL,
+  S, M, L, XL, XXL, XXXL, XXXXL
+}
+
+enum TshirtColor {
+  Orange, Blue, Grey
+}
+
 ScreenType getType(BuildContext context) {
 
  double deviceWidth = MediaQuery.of(context).size.shortestSide;
@@ -505,6 +514,7 @@ class FamilyMember{
   Age age;
   FamilyMemberTier tier;
   AssessmentStatus assessmentStatus = AssessmentStatus();
+  TshirtOptions tshirt;
 
   bool registered = false;
   DateTime registeredDate;
@@ -566,6 +576,15 @@ class FamilyMember{
     return ret; 
 
   }
+
+}
+
+class TshirtOptions {
+
+  TshirtSize size;
+  TshirtColor color;
+
+  TshirtOptions(this.size, this.color);
 
 }
 

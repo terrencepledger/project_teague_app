@@ -1,11 +1,9 @@
 import 'dart:ui';
-import 'package:csc_picker/csc_picker.dart';
 import 'package:firebase/firebase.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
@@ -146,13 +144,13 @@ class _PaymentsPage extends State<PaymentsPage> {
       List temp = [];
       query.snapshot.forEach((child) {
         temp.add(child);
-      }); 
+      });
       for (var item in temp) {
         FamilyMember member = await FamilyMember.toMember(item.val());
         member.id = item.key;
         setState(() {
           if(signIn.currentUser != null) {
-            if(member.id == signIn.currentUser.id) {
+            if(item.val()["verifiedId"] == signIn.currentUser.id) {
               current = member;
             }
           }
@@ -173,7 +171,7 @@ class _PaymentsPage extends State<PaymentsPage> {
     showPurchasePage = StatefulBuilder(
       builder: (BuildContext context2, StateSetter setstate2) {
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(14.0),
           child: Column(
             children: [
               Padding(
@@ -233,17 +231,17 @@ class _PaymentsPage extends State<PaymentsPage> {
                   itemBuilder: (context2, index) {
                     searchResults.sort((a, b) => a.name.split(" ").last.compareTo(b.name.split(' ').last));
                     return Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(4.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(4.0),
                             child: MyBullet(),
                           ),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(4.0),
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: CheckboxListTile(
@@ -271,7 +269,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                 )
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 25.0),
+                padding: const EdgeInsets.only(top: 15.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
