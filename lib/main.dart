@@ -1,14 +1,11 @@
-import 'package:csc_picker/csc_picker.dart';
 import 'package:firebase/firebase.dart' as firebase;
 import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:project_teague_app/Objects.dart';
 import 'package:project_teague_app/activitiesPage.dart';
+import 'package:project_teague_app/configure_web.dart';
 import 'package:project_teague_app/directorypage.dart';
 import 'package:project_teague_app/paymentsPage.dart';
-
 import 'homepage.dart';
 import 'signIn.dart';
 
@@ -24,11 +21,13 @@ void main() {
   }else {
     firebase.app(); // if already initialized, use that one
   }
+  configureApp();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -53,7 +52,7 @@ class App extends StatefulWidget {
   App({Key key}) : super(key: key);
 
   @override
-  _AppState createState() => _AppState(SignIn());
+  _AppState createState() => _AppState();
   
 }
 
@@ -63,7 +62,7 @@ class _AppState extends State<App> {
   double titleSize;
 
   SignIn signIn;
-  String displayName = "";
+  String displayName = "Anon User";
 
   Widget pageBody;
   String pageTitle;
@@ -74,13 +73,23 @@ class _AppState extends State<App> {
 
   DatabaseReference ref;
 
-  _AppState(SignIn signIn) {
-
-    this.signIn = signIn;
-
+  @override
+  void initState() {
+    super.initState();
+    this.signIn = SignIn();
     pageTitle = "Home";
     pageBody = HomePage(signIn, navigate);
+    Database db = database();
+    ref = db.ref('members');
 
+    Function func = (String name) {
+      setState(() {
+        displayName = name;
+      });
+      checkUser();
+    };
+
+    signIn.listener(func);
   }
 
   @override
@@ -88,18 +97,6 @@ class _AppState extends State<App> {
     
     checkSize();
     
-    Database db = database();
-    ref = db.ref('members');
-    
-    Function func = (String name) {
-      setState(() {
-        displayName = name;
-      });
-      loadMembers();
-      checkUser();
-    };
-
-    signIn.listener(func);
     super.didChangeDependencies();
     
   }
@@ -124,13 +121,19 @@ class _AppState extends State<App> {
 
   }
 
-  void loadMembers() async {
+  Future<void> loadMembers() async {
     
-    await ref.once('value').then((query) async {
+    return await ref.once('value').then((query) async {
       
       List temp = [];
+      unverified = [];
       if(query.snapshot.hasChildren()) {
-        query.snapshot.forEach((elem) => temp.add(elem));
+        print(query.snapshot.numChildren());
+        query.snapshot.forEach(
+          (elem) {
+            temp.add(elem);
+          }
+        );
         for (var child in temp) {
           FamilyMember member = await FamilyMember.toMember(child.val());
           member.id = child.key;
@@ -162,8 +165,10 @@ class _AppState extends State<App> {
 
   }
 
-  void assignMember() {
+  void assignMember() async {
     
+    await loadMembers();
+
     showGeneralDialog(
       context: context, 
       barrierDismissible: false,
@@ -184,7 +189,7 @@ class _AppState extends State<App> {
                           Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Text(
-                              "Select A Member to Assign to Your ID",
+                              "Select Your Name",
                               style: TextStyle(fontWeight: FontWeight.bold)
                             ),
                           ),
@@ -199,6 +204,8 @@ class _AppState extends State<App> {
                                   dropdownColor: Colors.white,
                                   style: TextStyle(color: Colors.black),
                                   items: List.generate(unverified.length, (index) {
+                                    print(unverified.length);
+                                    print(members.length);
                                     return DropdownMenuItem<FamilyMember>(
                                       value: unverified.elementAt(index), 
                                       child: Padding(
@@ -229,7 +236,6 @@ class _AppState extends State<App> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
                                   onPressed: memberToAssign != null ? () {
-                                    print(memberToAssign.name);
                                     ref.child(memberToAssign.id).update({"verifiedId": signIn.currentUser.id});
                                     Navigator.of(context).pop();
                                   } : null,
@@ -238,16 +244,19 @@ class _AppState extends State<App> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(20.0),
-                                child: Text(
-                                  "Or Create A New Member",
-                                  style: TextStyle(fontWeight: FontWeight.bold)
+                                child: Center(
+                                  child: Text(
+                                    "Or, If You Are New,\nCreate Your Account",
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
                                   onPressed: () => createMember(),
-                                  child: Text("Create Member"),
+                                  child: Text("Create Your Account"),
                                 ),
                               ),
                             ],

@@ -177,6 +177,15 @@ class _PaymentsPage extends State<PaymentsPage> {
           child: Column(
             children: [
               Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(                
+                  "Select Users to Add to Assessment",
+                  style: Theme.of(context).textTheme.headline4.copyWith(
+                    color: Colors.black
+                  )
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   onChanged: (value) {
@@ -302,7 +311,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                                                 Padding(
                                                   padding: const EdgeInsets.all(20.0),
                                                   child: Text(
-                                                    "Select Head of Household family member that is making this purchase",
+                                                    "Select Head of Household for This Purchase",
                                                     style: TextStyle(fontWeight: FontWeight.bold)
                                                   ),
                                                 ),

@@ -22,9 +22,8 @@ class SignIn {
         }
       }
     });
-
+    
     handleSignIn();
-    // _googleSignIn.signInSilently();
 
   }
 
@@ -34,6 +33,7 @@ class SignIn {
       currentUser = _googleSignIn.currentUser;
       // _listener.call(currentUser.displayName);
     } catch (error) {
+      print(error);
     }
   }
 

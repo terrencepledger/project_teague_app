@@ -40,8 +40,6 @@ class _ActivitiesPage extends State<ActivitiesPage> {
 
   List<PollOptions> checkSize() {
 
-    print("inside check");
-
     double _fontSize;
     double _padding;
 
@@ -82,12 +80,10 @@ class _ActivitiesPage extends State<ActivitiesPage> {
   }
 
   void updatePoll() {
-    print("hey");
 
     List<PollOptions> items = checkSize();
 
     Widget poll() {
-      print("inside poll");
       return StatefulBuilder(builder: (context2, setState) {
           
         return Padding(

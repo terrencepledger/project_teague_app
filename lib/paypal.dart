@@ -37,7 +37,7 @@ class Paypal {
           "detail": {
             "invoice_number": invNum.toString(),
             "currency_code": "USD",
-            "note": "Balance must be paid by ENTER_DATE",
+            "note": "Balance must be paid by July 01, 2022",
             "memo": "Head of Household ID: ${hoh.id}",
             "payment_term": {
               "due_date": "2022-07-01"

@@ -65,7 +65,6 @@ class _PollOptionsState extends State<PollOptions> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.fontSize);
     return Padding(
       padding: EdgeInsets.all(widget.padding),
       child: TextButton(

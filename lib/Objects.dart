@@ -25,7 +25,6 @@ ScreenType getType(BuildContext context) {
 
  double deviceWidth = MediaQuery.of(context).size.shortestSide;
 
- print(deviceWidth);
 
  if (deviceWidth > 800) return ScreenType.Desktop;
  if (deviceWidth > 526) return ScreenType.Tablet;
@@ -279,7 +278,7 @@ class CreateMemberPopup {
                                 showAlertDialog(context);
                               }
                             },
-                            child: Text("Create and Assign")
+                            child: Text("Create")
                           ),
                         ),
                       ],
@@ -475,7 +474,7 @@ class Location {
 
   Location(this.state, this.city);
 
-  String displayInfo() => state + ", " + city;
+  String displayInfo() => city + ", " + state;
 
 }
 
@@ -519,8 +518,8 @@ class FamilyMember{
 
   String displayInfo() {
 
-    String date = DateFormat('MM/dd/yyyy').format(dob);
-    return "${name.split(' ').last}, ${name.split(' ').first}; $date";
+    // String date = DateFormat('MM/dd/yyyy').format(dob);
+    return "${name.split(' ').last}, ${name.split(' ').first}; $email";
 
   }
 
@@ -686,7 +685,7 @@ class InvoiceItems{
       temp["quantity"] = "1";
       temp["unit_amount"] = {
         "currency_code": "USD",
-        "value": (theMember.tier == FamilyMemberTier.Adult ? 100.00 : 90.00).toStringAsFixed(2)
+        "value": (theMember.tier == FamilyMemberTier.Adult ? 100.00 : 25.00).toStringAsFixed(2)
       };
 
       ret.add(temp);
