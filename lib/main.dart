@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase/firebase.dart' as firebase;
 import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
@@ -152,14 +154,19 @@ class _AppState extends State<App> {
 
   }
 
-  void checkUser() {
+  void checkUser() async {
 
     ref.orderByChild("verifiedId").equalTo(signIn.currentUser.id)
     .limitToFirst(1).once('value').then(
-      (value) {
+      (value) async {
         if(value.snapshot.val()==null) {
           assignMember();
         }
+        // else {
+        //   FamilyMember member = await FamilyMember.toMember(value.snapshot.val()[signIn.currentUser.id]);
+        //   print(member);
+        //   print(member.tshirt);
+        // }
       }
     );
 
@@ -204,8 +211,6 @@ class _AppState extends State<App> {
                                   dropdownColor: Colors.white,
                                   style: TextStyle(color: Colors.black),
                                   items: List.generate(unverified.length, (index) {
-                                    print(unverified.length);
-                                    print(members.length);
                                     return DropdownMenuItem<FamilyMember>(
                                       value: unverified.elementAt(index), 
                                       child: Padding(
@@ -279,8 +284,9 @@ class _AppState extends State<App> {
 
     CreateMemberPopup(
       context, setState, 
-      (name, email, number, location, dob) {
+      (name, email, number, location, dob, tshirt) {
         memberToAssign = FamilyMember(name.text, email.text, location, dob);
+        memberToAssign.tshirt = tshirt;
         memberToAssign.id = signIn.currentUser.id;
         memberToAssign.addPhone(number.text);
         ref.child(memberToAssign.id).set(FamilyMember.toMap(memberToAssign));

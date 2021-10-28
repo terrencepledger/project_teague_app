@@ -47,13 +47,15 @@ class CreateMemberPopup {
   
   BuildContext context;
   Function setState;
-  void Function(TextEditingController name, TextEditingController email, TextEditingController number, Location location, DateTime dob) _onPressed;
+  void Function(TextEditingController name, TextEditingController email, TextEditingController number, Location location, DateTime dob, TshirtOptions tshirtOptions) _onPressed;
 
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController number = TextEditingController();
   Location location = Location("", "");
   DateTime dob;
+  TshirtSize size;
+  TshirtColor color;
 
   CreateMemberPopup(this.context, this.setState, this._onPressed);
 
@@ -273,6 +275,69 @@ class CreateMemberPopup {
                         ),
                       ],
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        children: [
+                          Text("Tshirt Options", style: Theme.of(context).textTheme.headline5,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              DropdownButton(
+                                hint: Text("Select Size"),
+                                value: size,
+                                dropdownColor: Colors.white,
+                                style: TextStyle(color: Colors.black),
+                                items: List.generate(TshirtSize.values.length, (index) {
+                                  return DropdownMenuItem<TshirtSize>(
+                                    value: TshirtSize.values.elementAt(index), 
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        TshirtSize.values.elementAt(index).toString().split('.')[1].split("_").join(" "),
+                                        style: TextStyle(
+                                          color: Colors.black
+                                        ),
+                                      ),
+                                    )
+                                  );
+                                }),
+                                onChanged: (newSize) {
+                                  setState2(() {
+                                    size = newSize;
+                                  });
+                                },
+                              ),
+                              DropdownButton(
+                                hint: Text("Select Color"),
+                                value: color,
+                                dropdownColor: Colors.white,
+                                style: TextStyle(color: Colors.black),
+                                items: List.generate(TshirtColor.values.length, (index) {
+                                  return DropdownMenuItem<TshirtColor>(
+                                    value: TshirtColor.values.elementAt(index), 
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        TshirtColor.values.elementAt(index).toString().split('.')[1],
+                                        style: TextStyle(
+                                          color: Colors.black
+                                        ),
+                                      ),
+                                    )
+                                  );
+                                }),
+                                onChanged: (newColor) {
+                                  setState2(() {
+                                    color = newColor;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -281,7 +346,7 @@ class CreateMemberPopup {
                           child: ElevatedButton(
                             onPressed: () async {
                               if(valid()) {
-                                _onPressed.call(name, email, number, location, dob);
+                                _onPressed.call(name, email, number, location, dob, TshirtOptions(size, color));
                               }
                               else {
                                 showAlertDialog(context);
@@ -363,6 +428,65 @@ class CreateMemberPopup {
                         ),
                       ],
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Tshirt Options", style: Theme.of(context).textTheme.headline5,),
+                          DropdownButton(
+                            hint: Text("Select Size"),
+                            value: size,
+                            dropdownColor: Colors.white,
+                            style: TextStyle(color: Colors.black),
+                            items: List.generate(TshirtSize.values.length, (index) {
+                              return DropdownMenuItem<TshirtSize>(
+                                value: TshirtSize.values.elementAt(index), 
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    TshirtSize.values.elementAt(index).toString().split('.')[1].split("_").join(" "),
+                                    style: TextStyle(
+                                      color: Colors.black
+                                    ),
+                                  ),
+                                )
+                              );
+                            }),
+                            onChanged: (newSize) {
+                              setState2(() {
+                                size = newSize;
+                              });
+                            },
+                          ),
+                          DropdownButton(
+                            hint: Text("Select Color"),
+                            value: color,
+                            dropdownColor: Colors.white,
+                            style: TextStyle(color: Colors.black),
+                            items: List.generate(TshirtColor.values.length, (index) {
+                              return DropdownMenuItem<TshirtColor>(
+                                value: TshirtColor.values.elementAt(index), 
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    TshirtColor.values.elementAt(index).toString().split('.')[1],
+                                    style: TextStyle(
+                                      color: Colors.black
+                                    ),
+                                  ),
+                                )
+                              );
+                            }),
+                            onChanged: (newColor) {
+                              setState2(() {
+                                color = newColor;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -372,13 +496,13 @@ class CreateMemberPopup {
                           child: ElevatedButton(
                             onPressed: () async {
                               if(valid()) {
-                                _onPressed.call(name, email, number, location, dob);
+                                _onPressed.call(name, email, number, location, dob, TshirtOptions(size, color));
                               }
                               else {
                                 showAlertDialog(context);
                               }
                             }, 
-                            child: Text("Create and Assign")
+                            child: Text("Create")
                           ),
                         ),
                       ],
@@ -553,13 +677,18 @@ class FamilyMember{
     object['phone'] = member.phone;
     object['dob'] = member.dob.millisecondsSinceEpoch;
     object['assessmentStatus'] = AssessmentStatus.toMap(member.assessmentStatus);
+    if(member.tshirt != null) {
+      object["tshirtOptions"] = { 
+        "size": member.tshirt.size.toString().split('.')[1].split('_').join(" "),
+        "color": member.tshirt.color.toString().split('.')[1]
+      };
+    }
 
     return object;
 
   }
 
   static Future<FamilyMember> toMember(Map<String, dynamic> object) async {
-
     String name = object['name'];
     String email = object['email'];
     Location location = Location(
@@ -570,6 +699,22 @@ class FamilyMember{
     DateTime dob = DateTime.fromMillisecondsSinceEpoch(object['dob']);
     AssessmentStatus assessmentStatus = AssessmentStatus.toAssessmentStatus(object["assessmentStatus"]);
     FamilyMember ret = FamilyMember(name, email, location, dob);
+    if(object.containsKey("tshirtOptions")) {
+      dynamic tshirtOptions = object["tshirtOptions"];
+      TshirtSize size = TshirtSize.values.firstWhere(
+        (e) {
+          String temp = tshirtOptions['size'].toString();
+          if(temp.contains(" ")) {
+            temp = temp.split(' ').join("_");
+          }
+          return e.toString() == ("TshirtSize." + temp); 
+        }
+      );
+      TshirtColor color = TshirtColor.values.firstWhere((element) => 
+        element.toString() == "TshirtColor." + tshirtOptions["color"].toString()
+      );
+      ret.tshirt = TshirtOptions(size, color);
+    }
     ret.addPhone(phone);
     ret.assessmentStatus = assessmentStatus;
 

@@ -272,6 +272,21 @@ class _HotelSlideState extends State<HotelSlide> {
                 ),
               ),
             ),
+            Text.rich(
+              TextSpan(
+                text: '\nReservation Link',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue.shade800,
+                  fontSize: widget.textSize
+                ),
+                recognizer: new TapGestureRecognizer()
+                  ..onTap = () {
+                    launch("https://www.marriott.com/event-reservations/reservation-link.mi?id=1635366658609&key=GRP&app=resvlink");
+                }
+              ),
+            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -279,7 +294,7 @@ class _HotelSlideState extends State<HotelSlide> {
                   alignment: Alignment.center,
                   child: SelectableText(
                     "\nSpringhill Suites by Marriot has agreed to reserve several rooms\nat a rate of \$129 plus tax per night from July 29 to 31, 2022"
-                    + "\n\nAddress: 524 South Saint Mary’s Street\nSan Antonio, Texas 78205\n\nCall here to book: (210)354-1333\nBe sure to mention the event is Teague Family Reunion",
+                    + "\n\nAddress: 524 South Saint Mary’s Street\nSan Antonio, Texas 78205\n\nCall here to book: (210) 354-1333\nBe sure to mention the event is Teague Family Reunion",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: widget.textSize

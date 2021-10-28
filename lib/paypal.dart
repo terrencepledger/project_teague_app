@@ -80,11 +80,14 @@ class Paypal {
               }
             }
           ],
-          // "additional_recipients": [
-          //   {
-          //     "email_address": "8.tpledger@kscholars.org"
-          //   }
-          // ],
+          "additional_recipients": [
+            {
+              "email_address": "8.tpledger@kscholars.org"
+            },
+            {
+              "email_address": "pledgerm2@yahoo.com"
+            }
+          ],
           "items": items.createItemList(),
           "configuration": {
             "partial_payment": {
@@ -109,7 +112,8 @@ class Paypal {
         "send_to_invoicer": "true",
         "send_to_recipient": "true",
         "additional_recipients": [
-          {"email_address": "8.tpledger@kscholars.org"}
+          {"email_address": "8.tpledger@kscholars.org"},
+          {"email_address": "pledgerm2@yahoo.com"}
         ]
       })
     ).then((res) async { 

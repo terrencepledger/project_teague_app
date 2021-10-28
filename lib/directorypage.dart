@@ -1,10 +1,7 @@
-import 'package:csc_picker/csc_picker.dart';
 import 'package:firebase/firebase.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-
+import 'dart:developer';
 import 'Objects.dart';
 
 class DirectoryPage extends StatefulWidget {
@@ -79,7 +76,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
   void showCreateMembers() {
 
-    CreateMemberPopup(context, setState, (name, email, number, location, dob) {
+    CreateMemberPopup(context, setState, (name, email, number, location, dob, tshirt) {
       List<FamilyMember> membersToAdd = [];
       membersToAdd.add(
         FamilyMember(name.text, email.text, location, dob)
@@ -88,6 +85,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
         (member) {
           member.addPhone(number.text);
           member.id = famRef.push(FamilyMember.toMap(member)).key;
+          member.tshirt = tshirt;
         }
       );
       setState(() {
