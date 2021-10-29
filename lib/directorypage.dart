@@ -76,7 +76,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
   void showCreateMembers() {
 
-    CreateMemberPopup(context, setState, (name, email, number, location, dob, tshirt) {
+    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize) {
       List<FamilyMember> membersToAdd = [];
       membersToAdd.add(
         FamilyMember(name.text, email.text, location, dob)
@@ -85,7 +85,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
         (member) {
           member.addPhone(number.text);
           member.id = famRef.push(FamilyMember.toMap(member)).key;
-          member.tshirt = tshirt;
+          member.tSize = tSize;
         }
       );
       setState(() {

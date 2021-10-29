@@ -620,7 +620,7 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   void showCreateMembers() {
 
-    CreateMemberPopup(context, setState, (name, email, number, location, dob, tshirt) {
+    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize) {
       List<FamilyMember> membersToAdd = [];
       membersToAdd.add(
         FamilyMember(name.text, email.text, location, dob)
@@ -630,7 +630,7 @@ class _PaymentsPage extends State<PaymentsPage> {
           setState(() {
             member.addPhone(number.text);
             member.id = ref.push(FamilyMember.toMap(member)).key;
-            member.tshirt = tshirt;
+            member.tSize = tSize;
             choices.add(member);
             selected[member] = true;
           });

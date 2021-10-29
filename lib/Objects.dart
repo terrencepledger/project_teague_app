@@ -26,10 +26,6 @@ enum TshirtSize {
   S, M, L, XL, XXL, XXXL, XXXXL
 }
 
-enum TshirtColor {
-  Orange, Blue, Grey
-}
-
 ScreenType getType(BuildContext context) {
 
  double deviceWidth = MediaQuery.of(context).size.shortestSide;
@@ -47,7 +43,7 @@ class CreateMemberPopup {
   
   BuildContext context;
   Function setState;
-  void Function(TextEditingController name, TextEditingController email, TextEditingController number, Location location, DateTime dob, TshirtOptions tshirtOptions) _onPressed;
+  void Function(TextEditingController name, TextEditingController email, TextEditingController number, Location location, DateTime dob, TshirtSize tSize) _onPressed;
 
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
@@ -55,7 +51,6 @@ class CreateMemberPopup {
   Location location = Location("", "");
   DateTime dob;
   TshirtSize size;
-  TshirtColor color;
 
   CreateMemberPopup(this.context, this.setState, this._onPressed);
 
@@ -279,7 +274,7 @@ class CreateMemberPopup {
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
                         children: [
-                          Text("Tshirt Options", style: Theme.of(context).textTheme.headline5,),
+                          Text("Tshirt Size", style: Theme.of(context).textTheme.headline5,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -308,31 +303,6 @@ class CreateMemberPopup {
                                   });
                                 },
                               ),
-                              DropdownButton(
-                                hint: Text("Select Color"),
-                                value: color,
-                                dropdownColor: Colors.white,
-                                style: TextStyle(color: Colors.black),
-                                items: List.generate(TshirtColor.values.length, (index) {
-                                  return DropdownMenuItem<TshirtColor>(
-                                    value: TshirtColor.values.elementAt(index), 
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        TshirtColor.values.elementAt(index).toString().split('.')[1],
-                                        style: TextStyle(
-                                          color: Colors.black
-                                        ),
-                                      ),
-                                    )
-                                  );
-                                }),
-                                onChanged: (newColor) {
-                                  setState2(() {
-                                    color = newColor;
-                                  });
-                                },
-                              ),
                             ],
                           ),
                         ],
@@ -346,7 +316,7 @@ class CreateMemberPopup {
                           child: ElevatedButton(
                             onPressed: () async {
                               if(valid()) {
-                                _onPressed.call(name, email, number, location, dob, TshirtOptions(size, color));
+                                _onPressed.call(name, email, number, location, dob, size);
                               }
                               else {
                                 showAlertDialog(context);
@@ -433,7 +403,7 @@ class CreateMemberPopup {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text("Tshirt Options", style: Theme.of(context).textTheme.headline5,),
+                          Text("Tshirt Size", style: Theme.of(context).textTheme.headline5,),
                           DropdownButton(
                             hint: Text("Select Size"),
                             value: size,
@@ -459,31 +429,6 @@ class CreateMemberPopup {
                               });
                             },
                           ),
-                          DropdownButton(
-                            hint: Text("Select Color"),
-                            value: color,
-                            dropdownColor: Colors.white,
-                            style: TextStyle(color: Colors.black),
-                            items: List.generate(TshirtColor.values.length, (index) {
-                              return DropdownMenuItem<TshirtColor>(
-                                value: TshirtColor.values.elementAt(index), 
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    TshirtColor.values.elementAt(index).toString().split('.')[1],
-                                    style: TextStyle(
-                                      color: Colors.black
-                                    ),
-                                  ),
-                                )
-                              );
-                            }),
-                            onChanged: (newColor) {
-                              setState2(() {
-                                color = newColor;
-                              });
-                            },
-                          ),
                         ],
                       ),
                     ),
@@ -496,7 +441,7 @@ class CreateMemberPopup {
                           child: ElevatedButton(
                             onPressed: () async {
                               if(valid()) {
-                                _onPressed.call(name, email, number, location, dob, TshirtOptions(size, color));
+                                _onPressed.call(name, email, number, location, dob, size);
                               }
                               else {
                                 showAlertDialog(context);
@@ -638,7 +583,7 @@ class FamilyMember{
   Age age;
   FamilyMemberTier tier;
   AssessmentStatus assessmentStatus = AssessmentStatus();
-  TshirtOptions tshirt;
+  TshirtSize tSize;
 
   bool registered = false;
   DateTime registeredDate;
@@ -677,11 +622,8 @@ class FamilyMember{
     object['phone'] = member.phone;
     object['dob'] = member.dob.millisecondsSinceEpoch;
     object['assessmentStatus'] = AssessmentStatus.toMap(member.assessmentStatus);
-    if(member.tshirt != null) {
-      object["tshirtOptions"] = { 
-        "size": member.tshirt.size.toString().split('.')[1].split('_').join(" "),
-        "color": member.tshirt.color.toString().split('.')[1]
-      };
+    if(member.tSize != null) {
+      object["tSize"] = member.tSize.toString().split('.')[1].split('_').join(" ");
     }
 
     return object;
@@ -699,21 +641,17 @@ class FamilyMember{
     DateTime dob = DateTime.fromMillisecondsSinceEpoch(object['dob']);
     AssessmentStatus assessmentStatus = AssessmentStatus.toAssessmentStatus(object["assessmentStatus"]);
     FamilyMember ret = FamilyMember(name, email, location, dob);
-    if(object.containsKey("tshirtOptions")) {
-      dynamic tshirtOptions = object["tshirtOptions"];
+    if(object.containsKey("tSize")) {
       TshirtSize size = TshirtSize.values.firstWhere(
         (e) {
-          String temp = tshirtOptions['size'].toString();
+          String temp = object['tSize'].toString();
           if(temp.contains(" ")) {
             temp = temp.split(' ').join("_");
           }
           return e.toString() == ("TshirtSize." + temp); 
         }
       );
-      TshirtColor color = TshirtColor.values.firstWhere((element) => 
-        element.toString() == "TshirtColor." + tshirtOptions["color"].toString()
-      );
-      ret.tshirt = TshirtOptions(size, color);
+      ret.tSize = size;
     }
     ret.addPhone(phone);
     ret.assessmentStatus = assessmentStatus;
@@ -721,15 +659,6 @@ class FamilyMember{
     return ret; 
 
   }
-
-}
-
-class TshirtOptions {
-
-  TshirtSize size;
-  TshirtColor color;
-
-  TshirtOptions(this.size, this.color);
 
 }
 

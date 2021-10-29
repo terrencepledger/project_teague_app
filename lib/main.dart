@@ -284,9 +284,9 @@ class _AppState extends State<App> {
 
     CreateMemberPopup(
       context, setState, 
-      (name, email, number, location, dob, tshirt) {
+      (name, email, number, location, dob, tSize) {
         memberToAssign = FamilyMember(name.text, email.text, location, dob);
-        memberToAssign.tshirt = tshirt;
+        memberToAssign.tSize = tSize;
         memberToAssign.id = signIn.currentUser.id;
         memberToAssign.addPhone(number.text);
         ref.child(memberToAssign.id).set(FamilyMember.toMap(memberToAssign));
