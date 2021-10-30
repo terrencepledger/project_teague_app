@@ -80,14 +80,14 @@ class Paypal {
               }
             }
           ],
-          "additional_recipients": [
-            {
-              "email_address": "8.tpledger@kscholars.org"
-            },
-            {
-              "email_address": "pledgerm2@yahoo.com"
-            }
-          ],
+          // "additional_recipients": [
+          //   {
+          //     "email_address": "8.tpledger@kscholars.org"
+          //   },
+          //   {
+          //     "email_address": "pledgerm2@yahoo.com"
+          //   }
+          // ],
           "items": items.createItemList(),
           "configuration": {
             "partial_payment": {
@@ -145,6 +145,88 @@ class Paypal {
       
   }
 
+  Future<void> modifyInvoice(BuildContext context, FamilyMember hoh, InvoiceItems items) async {
+
+    var response = await client.put(Uri.parse('$domain/v2/invoicing/invoices/${hoh.assessmentStatus.invoice.id}'),
+      headers: {"Content-Type": "application/json",}, 
+      body: json.encode(
+        {
+          "detail": {
+            "invoice_number": hoh.assessmentStatus.invoice.invNum,
+            "currency_code": "USD",
+            "note": "Balance must be paid by July 01, 2022",
+            "memo": "Head of Household ID: ${hoh.id}",
+            "payment_term": {
+              "due_date": "2022-07-01"
+            },
+          },
+          "invoicer": {
+            "name": {
+              "given_name": "KC Teague",
+              "surname": "Reunion"
+            },
+            "address": {
+              "address_line_1": "6201 Yecker Ave.",
+              "admin_area_2": "Kansas City",
+              "admin_area_1": "KS",
+              "postal_code": "66104",
+              "country_code": "US"
+            },
+            "email": "kcteaguereunion2022@gmail.com",
+            "phones": [{
+              "national_number": "9137100766",
+              "phone_type": "MOBILE",
+              "country_code": "001"
+            }],
+            "website": "www.kcteague.com",
+            "tax_id": "87-1386919",
+          },
+          "primary_recipients": [
+            {
+              "billing_info": {
+                "name": {
+                  "given_name": hoh.name.split(" ").first,
+                  "surname": hoh.name.split(" ").last
+                },
+                "email_address": hoh.email,
+                "phones": [{
+                  "country_code": "001",
+                  "national_number": hoh.phone,
+                  "phone_type": "MOBILE"
+                }],
+              }
+            }
+          ],
+          // "additional_recipients": [
+          //   {
+          //     "email_address": "8.tpledger@kscholars.org"
+          //   },
+          //   {
+          //     "email_address": "pledgerm2@yahoo.com"
+          //   }
+          // ],
+          "items": items.createItemList(),
+          "configuration": {
+            "partial_payment": {
+              "allow_partial_payment": true,
+            },
+            "allow_tip": false,
+            "tax_inclusive": false,
+          },
+        }
+      )
+    );
+    
+    if(response.statusCode != 200 && response.statusCode != 201) {
+      throw PaypalError(response);
+    }
+    else {
+      return;
+    }
+
+
+  }
+
 }
 
 class PaypalError implements Exception {
@@ -152,6 +234,6 @@ class PaypalError implements Exception {
   String reason;
   int code;
   
-  PaypalError(Response response) : reason = response.reasonPhrase, code = response.statusCode;
+  PaypalError(Response response) : reason = json.decode(response.body)["message"], code = response.statusCode;
 
 }

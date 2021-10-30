@@ -130,7 +130,6 @@ class _AppState extends State<App> {
       List temp = [];
       unverified = [];
       if(query.snapshot.hasChildren()) {
-        print(query.snapshot.numChildren());
         query.snapshot.forEach(
           (elem) {
             temp.add(elem);

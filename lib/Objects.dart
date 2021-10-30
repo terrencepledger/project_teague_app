@@ -4,11 +4,18 @@ import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:quiver/core.dart';
 
 enum Activity {
   Riverwalk, Alamo, SixFlags, SeaWorld,
   Caverns, Zoo, Bus, Shopping, Ripleys, 
   Splashtown, Escape, Aquatica
+}
+
+enum AssessmentPosition {
+
+  hoh, participant
+
 }
 
 enum FamilyMemberTier {
@@ -489,13 +496,17 @@ class AssessmentStatus {
   bool created = false;
   String invoiceId;
   Invoice invoice;
+  AssessmentPosition position;
 
   static Map<String, dynamic> toMap(AssessmentStatus assessmentStatus) {
 
     Map<String, dynamic> object = {};
     
     object['created'] = assessmentStatus.created;
-    object['invoiceId'] = assessmentStatus.invoiceId;
+    if(assessmentStatus.created) {
+      object['invoiceId'] = assessmentStatus.invoiceId;
+      object['position'] = assessmentStatus.position.toString().split('.')[1];
+    }
 
     return object;
 
@@ -504,11 +515,13 @@ class AssessmentStatus {
   static AssessmentStatus toAssessmentStatus(Map<String, dynamic> object) {
     
     bool created = object['created'];
-    String invoiceId = object["invoiceId"];
 
     AssessmentStatus ret = AssessmentStatus();
     ret.created = created;
-    ret.invoiceId = invoiceId;
+    if(ret.created) {
+      ret.invoiceId = object["invoiceId"];
+      ret.position = AssessmentPosition.values.firstWhere((pos) => pos.toString() == "AssessmentPosition." + object['position']);
+    }    
 
     return ret; 
 
@@ -598,7 +611,7 @@ class FamilyMember{
   String displayInfo() {
 
     // String date = DateFormat('MM/dd/yyyy').format(dob);
-    return "${name.split(' ').last}, ${name.split(' ').first}; $email";
+    return "$name - $email";
 
   }
 
@@ -607,6 +620,13 @@ class FamilyMember{
     String date = DateFormat('MM/dd/yyyy').format(dob);
     return "${name.split(' ').last}, ${name.split(' ').first}; $email;${phone != null ? " $phone; " : null}${ location.city}, ${location.state}; $date";
 
+  }
+
+  int get hashCode => hash2(id.hashCode, name.hashCode);
+
+  @override
+  bool operator ==(Object other) {
+    return (other is FamilyMember && other.id == id);
   }
 
   static Map<String, dynamic> toMap(FamilyMember member) {
@@ -749,12 +769,12 @@ class Invoice{
 
 class InvoiceItems{
 
-  List<FamilyMember> tickets = [];
+  List<FamilyMember> assessments = [];
   // Map<Activity, List<FamilyMember>> activities = {};
   // List<TShirtOrder> tshirts = [];
 
   void addMember(FamilyMember member) {
-    tickets.add(member);
+    assessments.add(member);
   }
 
   // void addActivity(Activity activity, List<FamilyMember> members) {
@@ -762,14 +782,14 @@ class InvoiceItems{
   // }
 
   void removeMember(FamilyMember member) {
-    tickets.removeWhere((given) => given.id == member.id);
+    assessments.removeWhere((given) => given.id == member.id);
   }
 
   List<Map<String, Object>> createItemList() {
 
     List<Map<String, Object>> ret = [];
 
-    tickets.forEach((theMember) {
+    assessments.forEach((theMember) {
 
       Map<String, Object> temp = {}; 
       
@@ -824,7 +844,7 @@ class InvoiceItems{
 
     double total = 0;
 
-    tickets.forEach((member) { 
+    assessments.forEach((member) { 
       total += (member.tier == FamilyMemberTier.Adult ? 100 : 90);
     });
 
@@ -836,7 +856,7 @@ class InvoiceItems{
 
     List<Map<String, dynamic>> ret = [];
 
-    items.tickets.forEach((theMember) {
+    items.assessments.forEach((theMember) {
 
       Map<String, Object> temp = {}; 
 
