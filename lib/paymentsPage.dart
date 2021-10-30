@@ -196,11 +196,8 @@ class _PaymentsPage extends State<PaymentsPage> {
             FamilyMember member = await FamilyMember.toMember(child.value);
             member.id = child.key;
             bool contained = current.assessmentStatus.created ? current.assessmentStatus.invoice.items.assessments.contains(member) : false;
-            print(items.createItemList());
-            print(member.name + " : " + contained.toString());
             setState(() {
               if(!member.assessmentStatus.created || contained) {
-                print("inside");
                 choices.add(member);
                 selected[member] = contained;
               }
@@ -658,11 +655,14 @@ class _PaymentsPage extends State<PaymentsPage> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                modifyItems();
-                              },
-                              child: Text("Modify Items")
+                            child: Tooltip(
+                              message: current.assessmentStatus.position == AssessmentPosition.hoh ? ""
+                              : "Only the Head of Household is able to modify the invoice",
+                              child: ElevatedButton(
+                                onPressed: current.assessmentStatus.position == AssessmentPosition.hoh ? 
+                                  () => modifyItems() : null,
+                                child: Text("Modify Items")
+                              ),
                             ),
                           )
                         ],
