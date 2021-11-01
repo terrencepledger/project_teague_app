@@ -64,9 +64,10 @@ class CreateMemberPopup {
   bool valid() {
 
     if(name.text.length > 0 && email.text.contains("@") && location.state != null && location.city != null
-      && dob != null && number.text.length == 10
-    )
+      && dob != null && number.text.length == 10 && size != null
+    ) {
       return true;
+    }
     else {
       return false;      
     }
@@ -81,6 +82,8 @@ class CreateMemberPopup {
       error += "Please enter a valid phone number\n";
     if(!email.text.contains("@"))
       error += "Please enter a valid email address\n";
+    if(size == null)
+      error += "Please select a tshirt size\n";
     else
       error += "To submit a new member, all fields must be entered.\n\nPlease fill in all fields (including birthday) and submit again.";
 
@@ -360,7 +363,7 @@ class CreateMemberPopup {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: TextFormField(
                             controller: name,
                             style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
@@ -370,7 +373,7 @@ class CreateMemberPopup {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: TextFormField(
                             controller: email,
                             style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
@@ -381,7 +384,7 @@ class CreateMemberPopup {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: TextFormField(
                             controller: number,
                             decoration: InputDecoration(
@@ -393,11 +396,11 @@ class CreateMemberPopup {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: locationPicker(setState),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: ElevatedButton(
                             onPressed: () {selectDOB(setState2);}, 
                             child: Text((dob == null) ? "Enter Date of Birth" : DateFormat('MM/dd/yyyy').format(dob))
@@ -405,13 +408,16 @@ class CreateMemberPopup {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("Tshirt Size", style: Theme.of(context).textTheme.headline5,),
-                          DropdownButton(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text("Tshirt Size", style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.black),),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: DropdownButton(
                             hint: Text("Select Size"),
                             value: size,
                             dropdownColor: Colors.white,
@@ -420,7 +426,7 @@ class CreateMemberPopup {
                               return DropdownMenuItem<TshirtSize>(
                                 value: TshirtSize.values.elementAt(index), 
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(4.0),
                                   child: Text(
                                     TshirtSize.values.elementAt(index).toString().split('.')[1].split("_").join(" "),
                                     style: TextStyle(
@@ -436,28 +442,22 @@ class CreateMemberPopup {
                               });
                             },
                           ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0, right: 4),
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if(valid()) {
-                                _onPressed.call(name, email, number, location, dob, size);
-                              }
-                              else {
-                                showAlertDialog(context);
-                              }
-                            }, 
-                            child: Text("Create")
-                          ),
                         ),
                       ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0, right: 4),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if(valid()) {
+                            _onPressed.call(name, email, number, location, dob, size);
+                          }
+                          else {
+                            showAlertDialog(context);
+                          }
+                        }, 
+                        child: Text("Create")
+                      ),
                     ),
                   ]
                 ),

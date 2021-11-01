@@ -150,7 +150,7 @@ class Paypal {
 
   Future<void> modifyInvoice(BuildContext context, FamilyMember hoh, InvoiceItems items) async {
 
-    var response = await client.put(Uri.parse('$domain/v2/invoicing/invoices/${hoh.assessmentStatus.invoice.id}'),
+    var response = await client.put(Uri.parse('$domain/v2/invoicing/invoices/${hoh.assessmentStatus.invoice.id}?send_to_invoice=true'),
       headers: {"Content-Type": "application/json",}, 
       body: json.encode(
         {
