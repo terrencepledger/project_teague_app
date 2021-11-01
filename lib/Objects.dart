@@ -63,7 +63,7 @@ class CreateMemberPopup {
 
   bool valid() {
 
-    if(name.text != null && email.text != null && location.state != null && location.city != null
+    if(name.text.length > 0 && email.text.contains("@") && location.state != null && location.city != null
       && dob != null && number.text.length == 10
     )
       return true;
@@ -749,7 +749,7 @@ class Invoice{
     InvoiceItems items = InvoiceItems();
     for (var item in object["items"]) {
       switch (item["name"]) {
-        case "Child Assessement":
+        case "Child Assessment":
         case "Adult Assessment":
           var split = item["description"].toString().split(': ').last.split(" (");
           String id = split.last.split(')').first;
@@ -818,6 +818,10 @@ class InvoiceItems{
         "currency_code": "USD",
         "value": (theMember.tier == FamilyMemberTier.Adult ? 100.00 : 25.00).toStringAsFixed(2)
       };
+      // temp["tax"] = {
+      //   "name": "Sales Tax",
+      //   "percent": "3.99",
+      // };
 
       ret.add(temp);
 

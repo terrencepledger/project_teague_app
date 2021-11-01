@@ -80,19 +80,20 @@ class Paypal {
               }
             }
           ],
-          // "additional_recipients": [
-          //   {
-          //     "email_address": "8.tpledger@kscholars.org"
-          //   },
-          //   {
-          //     "email_address": "pledgerm2@yahoo.com"
-          //   }
-          // ],
+          "additional_recipients": [
+            "8.tpledger@kscholars.org",
+            "pledgerm2@yahoo.com"
+          ],
           "items": items.createItemList(),
           "configuration": {
             "partial_payment": {
               "allow_partial_payment": true,
+              "minimum_amount_due": {
+                "currency_code": "USD",
+                "value": "20.00"
+              }
             },
+            
             "allow_tip": false,
             "tax_inclusive": false,
           },
@@ -112,9 +113,9 @@ class Paypal {
         "send_to_invoicer": "true",
         "send_to_recipient": "true",
         "additional_recipients": [
-          {"email_address": "8.tpledger@kscholars.org"},
-          {"email_address": "pledgerm2@yahoo.com"}
-        ]
+          "8.tpledger@kscholars.org",
+          "pledgerm2@yahoo.com"
+        ],
       })
     ).then((res) async { 
       if(res.statusCode == 202 || res.statusCode == 200) {
@@ -123,7 +124,9 @@ class Paypal {
         ret.items = items;
       }
       else
+      {
         throw PaypalError(res);
+      }
     });
 
     return ret;
@@ -197,18 +200,17 @@ class Paypal {
               }
             }
           ],
-          // "additional_recipients": [
-          //   {
-          //     "email_address": "8.tpledger@kscholars.org"
-          //   },
-          //   {
-          //     "email_address": "pledgerm2@yahoo.com"
-          //   }
-          // ],
+          "additional_recipients": [
+              "8.tpledger@kscholars.org", "pledgerm2@yahoo.com"
+          ],
           "items": items.createItemList(),
           "configuration": {
             "partial_payment": {
               "allow_partial_payment": true,
+              "minimum_amount_due": {
+                "currency_code": "USD",
+                "value": "20.00"
+              }
             },
             "allow_tip": false,
             "tax_inclusive": false,
@@ -233,7 +235,8 @@ class PaypalError implements Exception {
   
   String reason;
   int code;
-  
+  String details;
+
   PaypalError(Response response) : reason = json.decode(response.body)["message"], code = response.statusCode;
 
 }

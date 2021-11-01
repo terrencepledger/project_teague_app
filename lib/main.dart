@@ -161,11 +161,6 @@ class _AppState extends State<App> {
         if(value.snapshot.val()==null) {
           assignMember();
         }
-        // else {
-        //   FamilyMember member = await FamilyMember.toMember(value.snapshot.val()[signIn.currentUser.id]);
-        //   print(member);
-        //   print(member.tshirt);
-        // }
       }
     );
 

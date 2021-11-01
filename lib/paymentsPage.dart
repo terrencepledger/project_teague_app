@@ -141,6 +141,7 @@ class _PaymentsPage extends State<PaymentsPage> {
           );
         }
         on PaypalError catch (e) {
+          print(e.details);
           responseMessage = Text(
             "Unable to modify and re-send invoice. Please note error code: ${e.code} - '${e.reason}' and contact Terrence Pledger for further assistance",
             style: TextStyle(
@@ -187,7 +188,8 @@ class _PaymentsPage extends State<PaymentsPage> {
 
         setState(() {
           choices.add(current);
-          selected[current] = current.assessmentStatus.created;
+          selected[current] = true;
+          items.addMember(current);
         });
 
         for (var child in query.snapshot.val().entries) {
@@ -314,14 +316,16 @@ class _PaymentsPage extends State<PaymentsPage> {
                                   ), 
                                   value: selected[searchResults.elementAt(index)],
                                   onChanged: (boolVal) {
-                                    setstate2(() {
-                                      selected[choices.elementAt(index)] = boolVal;
-                                    });
-                                    if(boolVal) {
-                                      items.addMember(searchResults.elementAt(index));
-                                    }
-                                    else {
-                                      items.removeMember(searchResults.elementAt(index));
+                                    if(choices.elementAt(index) != current) {
+                                      setstate2(() {
+                                        selected[choices.elementAt(index)] = boolVal;
+                                      });
+                                      if(boolVal) {
+                                        items.addMember(searchResults.elementAt(index));
+                                      }
+                                      else {
+                                        items.removeMember(searchResults.elementAt(index));
+                                      }
                                     }
                                   },
                                 )
