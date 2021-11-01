@@ -69,7 +69,7 @@ class Paypal {
               "billing_info": {
                 "name": {
                   "given_name": hoh.name.split(" ").first,
-                  "surname": hoh.name.split(" ").last
+                  "surname": hoh.name.split(" ").getRange(1, hoh.name.split(' ').length).join(' ')
                 },
                 "email_address": hoh.email,
                 "phones": [{
@@ -186,7 +186,7 @@ class Paypal {
               "billing_info": {
                 "name": {
                   "given_name": hoh.name.split(" ").first,
-                  "surname": hoh.name.split(" ").last
+                  "surname": hoh.name.split(" ").getRange(1, hoh.name.split(' ').length).join(' ')
                 },
                 "email_address": hoh.email,
                 "phones": [{

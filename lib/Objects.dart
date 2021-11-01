@@ -585,6 +585,14 @@ class MyBullet extends StatelessWidget{
 
 }
 
+class Verification {
+  String verifiedId;
+  String email;
+
+  Verification(this.verifiedId, this.email);
+
+}
+
 class FamilyMember{
 
   String id;
@@ -597,6 +605,7 @@ class FamilyMember{
   FamilyMemberTier tier;
   AssessmentStatus assessmentStatus = AssessmentStatus();
   TshirtSize tSize;
+  Verification verification;
 
   bool registered = false;
   DateTime registeredDate;
@@ -645,6 +654,12 @@ class FamilyMember{
     if(member.tSize != null) {
       object["tSize"] = member.tSize.toString().split('.')[1].split('_').join(" ");
     }
+    if(member.verification != null) {
+      object['verification'] = { 
+        "verifiedId": member.verification.verifiedId, 
+        "email": member.verification.email
+      };
+    }
 
     return object;
 
@@ -672,6 +687,9 @@ class FamilyMember{
         }
       );
       ret.tSize = size;
+    }
+    if(object.containsKey("verification")) {
+      ret.verification = Verification(object['verification']['verifiedId'], object['verification']['email']);
     }
     ret.addPhone(phone);
     ret.assessmentStatus = assessmentStatus;
@@ -845,10 +863,24 @@ class InvoiceItems{
     double total = 0;
 
     assessments.forEach((member) { 
-      total += (member.tier == FamilyMemberTier.Adult ? 100 : 90);
+      total += (member.tier == FamilyMemberTier.Adult ? 100 : 25);
     });
 
     return total;
+
+  }
+
+  static clone(InvoiceItems oldItems) {
+
+    InvoiceItems newItems = InvoiceItems();
+
+    oldItems.assessments.forEach((element) {
+      newItems.addMember(element);
+    });
+
+    //oldItems.activities
+
+    return newItems;
 
   }
 

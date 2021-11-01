@@ -95,7 +95,8 @@ class _PaymentsPage extends State<PaymentsPage> {
             totalAmt = invoice.amt;
           });
           
-          ref.child(hoh.id).set(FamilyMember.toMap(hoh));
+          ref.child(hoh.id).update({'assessmentStatus': AssessmentStatus.toMap(hoh.assessmentStatus)});
+          
           items.assessments.forEach((member) {
             if(member.id != hoh.id) {
               member.assessmentStatus.created = true;
@@ -119,7 +120,6 @@ class _PaymentsPage extends State<PaymentsPage> {
 
       }
       else {
-        
         try {
           await paypal.modifyInvoice(context, hoh, items);
           hoh.assessmentStatus.invoice.items.assessments.forEach((member) {
@@ -128,14 +128,12 @@ class _PaymentsPage extends State<PaymentsPage> {
             }
           });
           items.assessments.forEach((member) {
-            print(hoh.id);
-            print(member.id);
             if(member.id != hoh.id) {
               member.assessmentStatus.created = true;
               member.assessmentStatus.invoiceId = current.assessmentStatus.invoice.id;
               member.assessmentStatus.invoice = current.assessmentStatus.invoice;
               member.assessmentStatus.position = AssessmentPosition.participant;
-              ref.child(member.id).set(FamilyMember.toMap(member));
+              ref.child(member.id).update({'assessmentStatus': AssessmentStatus.toMap(member.assessmentStatus)});
             }
           });
           responseMessage = Text(
@@ -176,7 +174,8 @@ class _PaymentsPage extends State<PaymentsPage> {
         current = await FamilyMember.toMember(
           query.snapshot.val().entries.firstWhere(
             (e) {
-              return e.value['verifiedId']==signIn.currentUser.id;
+              id = e.key;
+              return e.value['verification'] != null && e.value['verification']['verifiedId']==signIn.currentUser.id;
             }
           ).value
         );
@@ -192,7 +191,7 @@ class _PaymentsPage extends State<PaymentsPage> {
         });
 
         for (var child in query.snapshot.val().entries) {
-          if(child.value['verifiedId'] != signIn.currentUser.id) {
+          if((child.value['verification'] == null) || (child.value['verification']['verifiedId'] != signIn.currentUser.id)) {
             FamilyMember member = await FamilyMember.toMember(child.value);
             member.id = child.key;
             bool contained = current.assessmentStatus.created ? current.assessmentStatus.invoice.items.assessments.contains(member) : false;
@@ -226,7 +225,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               Padding(
                 padding: EdgeInsets.all(6),
                 child: Text(                
-                  "Select All Family Members Below That Need to Register For the Reunion",
+                  "Please Select Every Member of Your Family That's Attending the Reunion",
                   style: Theme.of(context).textTheme.headline4.copyWith(
                     color: Colors.black
                   ),
@@ -236,7 +235,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               Padding(
                 padding: EdgeInsets.all(4),
                 child: Text(                
-                  "** If Someone Is Missing, Click the Create Button to Make Their Account **",
+                  "** If You Do Not See Someone's Name, Click the Create Button Below to Add Them to The Registry **",
                   style: Theme.of(context).textTheme.headline5.copyWith(
                     color: Colors.black,
                     decoration: TextDecoration.none
@@ -385,7 +384,6 @@ class _PaymentsPage extends State<PaymentsPage> {
                               );
                             },
                           );
-
                           if(confirmed) {
                             await closeDialog(current);
                           }
@@ -488,7 +486,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                           //   }
                           // );
                         }, 
-                        child: Text("Purchase")
+                        child: Text("Register")
                       ),
                     )
                   ]
@@ -502,6 +500,19 @@ class _PaymentsPage extends State<PaymentsPage> {
     
     showPurchaseStatus = StatefulBuilder(
       builder: (BuildContext context, setState) {
+
+        Widget modifyButton = ElevatedButton(
+          onPressed: () => modifyItems(),
+          child: Text("Modify Items")
+        );
+        Widget tooltipButton = Tooltip(
+          message: "Only the Head of Household is able to modify the registration",
+          child: ElevatedButton(
+            onPressed: null,
+            child: Text("Modify Items"),
+          ),
+        );
+
         return Container(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -655,15 +666,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Tooltip(
-                              message: current.assessmentStatus.position == AssessmentPosition.hoh ? ""
-                              : "Only the Head of Household is able to modify the invoice",
-                              child: ElevatedButton(
-                                onPressed: current.assessmentStatus.position == AssessmentPosition.hoh ? 
-                                  () => modifyItems() : null,
-                                child: Text("Modify Items")
-                              ),
-                            ),
+                            child: current.assessmentStatus.position == AssessmentPosition.hoh ? modifyButton : tooltipButton
                           )
                         ],
                       ),
@@ -745,7 +748,7 @@ class _PaymentsPage extends State<PaymentsPage> {
     );
 
     setState(() {
-      items = current.assessmentStatus.invoice.items;
+      items = InvoiceItems.clone(current.assessmentStatus.invoice.items);
       pageBody = showPurchasePage;
     });
 

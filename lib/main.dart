@@ -139,7 +139,7 @@ class _AppState extends State<App> {
           FamilyMember member = await FamilyMember.toMember(child.val());
           member.id = child.key;
           setState(() {
-            if(child.val()["verifiedId"] == null) {
+            if(child.val()["verification"] == null) {
               unverified.add(member);
             }
             members.add(member);
@@ -155,7 +155,7 @@ class _AppState extends State<App> {
 
   void checkUser() async {
 
-    ref.orderByChild("verifiedId").equalTo(signIn.currentUser.id)
+    ref.orderByChild("verification/verifiedId").equalTo(signIn.currentUser.id)
     .limitToFirst(1).once('value').then(
       (value) async {
         if(value.snapshot.val()==null) {
@@ -240,7 +240,7 @@ class _AppState extends State<App> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: ElevatedButton(
                                   onPressed: memberToAssign != null ? () {
-                                    ref.child(memberToAssign.id).update({"verifiedId": signIn.currentUser.id});
+                                    ref.child(memberToAssign.id).update({"verification": {'verifiedId': signIn.currentUser.id, 'email': signIn.currentUser.email}});
                                     Navigator.of(context).pop();
                                   } : null,
                                   child: Text("Submit"),
@@ -288,8 +288,8 @@ class _AppState extends State<App> {
         memberToAssign.tSize = tSize;
         memberToAssign.id = signIn.currentUser.id;
         memberToAssign.addPhone(number.text);
+        memberToAssign.verification = Verification(signIn.currentUser.id, signIn.currentUser.email);
         ref.child(memberToAssign.id).set(FamilyMember.toMap(memberToAssign));
-        ref.child(memberToAssign.id).update({"verifiedId": memberToAssign.id});
         setState(() {
           members.add(memberToAssign);
         });
@@ -327,7 +327,7 @@ class _AppState extends State<App> {
         break;
       case 3: 
         tempPage = PaymentsPage(signIn);
-        tempTitle = 'Payment';
+        tempTitle = 'Registration';
       break;
     }
 
@@ -385,7 +385,7 @@ class _AppState extends State<App> {
           Padding(
             padding: EdgeInsets.all(padding),
             child: TextButton(
-              child: Text('Payment'),
+              child: Text('Registration'),
               onPressed: () { navigate(3); },
             ),
           ),
