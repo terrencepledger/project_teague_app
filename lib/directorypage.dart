@@ -66,9 +66,11 @@ class _DirectoryPageState extends State<DirectoryPage> {
       for (var item in temp) {
         FamilyMember member = await FamilyMember.toMember(item.val());
         member.id = item.key;
-        setState(() {
-          members.add(member);
-        });
+        if(member.isDirectoryMember) {
+          setState(() {
+            members.add(member);
+          });
+        }
       }
     });
 
@@ -76,7 +78,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
   void showCreateMembers() {
 
-    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize) {
+    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize, isDirectoryMember) {
       List<FamilyMember> membersToAdd = [];
       membersToAdd.add(
         FamilyMember(name.text, email.text, location, dob)
@@ -84,13 +86,18 @@ class _DirectoryPageState extends State<DirectoryPage> {
       membersToAdd.forEach(
         (member) {
           member.addPhone(number.text);
-          member.id = famRef.push(FamilyMember.toMap(member)).key;
           member.tSize = tSize;
+          if(!isDirectoryMember) {
+            member.isDirectoryMember = false;
+          }
+          member.id = famRef.push(FamilyMember.toMap(member)).key;
         }
       );
-      setState(() {
-        members.addAll(membersToAdd);
-      });
+      if(isDirectoryMember) {
+        setState(() {
+          members.addAll(membersToAdd);
+        });
+      }
       Navigator.of(context).pop();
     }).show();
     

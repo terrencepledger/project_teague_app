@@ -278,8 +278,11 @@ class _AppState extends State<App> {
 
     CreateMemberPopup(
       context, setState, 
-      (name, email, number, location, dob, tSize) {
+      (name, email, number, location, dob, tSize, isDirectoryMember) {
         memberToAssign = FamilyMember(name.text, email.text, location, dob);
+        if(!isDirectoryMember) {
+          memberToAssign.isDirectoryMember = false;
+        }
         memberToAssign.tSize = tSize;
         memberToAssign.id = signIn.currentUser.id;
         memberToAssign.addPhone(number.text);

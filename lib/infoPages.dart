@@ -125,7 +125,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "\nTo access more information",
+                    "\nFor details on the hotel, activities,",
                     style: TextStyle(
                       fontSize: widget.textSize
                     ),
@@ -133,7 +133,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "such as the hotel, activities list,",
+                    "and assessment registration,",
                     style: TextStyle(
                       fontSize: widget.textSize
                     ),
@@ -141,7 +141,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "activities poll, and assessment details,\nclick on the arrows below",
+                    "click on the arrows below.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: widget.textSize
@@ -150,7 +150,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "\nBut be sure to head to the directory page",
+                    "\nImportant: During registration, please create an account",
                     style: TextStyle(
                       fontSize: widget.textSize
                     ),
@@ -158,7 +158,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "and 'create a family member', as this",
+                    "for each person attending the reunion. However, if they",
                     style: TextStyle(
                       fontSize: widget.textSize
                     ),
@@ -166,7 +166,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "will gather your information and add you to",
+                    "are not a Teague family member, deselect the",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: widget.textSize
@@ -175,7 +175,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "the Teague Family Directory,",
+                    "'add to directory' box so that only Teague",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: widget.textSize
@@ -184,7 +184,7 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "which is necessary for the assessment.",
+                    "members appear in the website directory.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: widget.textSize
@@ -194,8 +194,8 @@ class _OverviewSlideState extends State<OverviewSlide> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: ElevatedButton(onPressed: () {widget.navigate(1);}, child: Text("Directory")),
+              padding: const EdgeInsets.only(top: 20.0, bottom: 10),
+              child: ElevatedButton(onPressed: () {widget.navigate(3);}, child: Text("Register")),
             )
           ]
         ),
@@ -293,8 +293,8 @@ class _HotelSlideState extends State<HotelSlide> {
                 child: Align(
                   alignment: Alignment.center,
                   child: SelectableText(
-                    "\nSpringhill Suites by Marriot has agreed to reserve several rooms\nat a rate of \$129 plus tax per night from July 29 to 31, 2022"
-                    + "\n\nAddress: 524 South Saint Mary’s Street\nSan Antonio, Texas 78205\n\nCall here to book: (210) 354-1333\nBe sure to mention the event is Teague Family Reunion",
+                    "\nSpringhill Suites by Marriot has agreed to reserve several rooms\nat a rate of \$129 plus tax per night from July 29 - 31, 2022"
+                    + "\n\nAddress: 524 South Saint Mary’s Street\nSan Antonio, Texas 78205\n\nCall here to book: (210) 354-1333\nOr Tap The Link Above\nBe sure to mention the event is Teague Family Reunion",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: widget.textSize

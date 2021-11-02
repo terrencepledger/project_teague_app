@@ -19,7 +19,7 @@ enum AssessmentPosition {
 }
 
 enum FamilyMemberTier {
-  Adult, Child
+  Adult, Child, Baby
 }
 
 enum InvoiceStatus {
@@ -50,7 +50,7 @@ class CreateMemberPopup {
   
   BuildContext context;
   Function setState;
-  void Function(TextEditingController name, TextEditingController email, TextEditingController number, Location location, DateTime dob, TshirtSize tSize) _onPressed;
+  void Function(TextEditingController name, TextEditingController email, TextEditingController number, Location location, DateTime dob, TshirtSize tSize, bool directoryMember) _onPressed;
 
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
@@ -58,6 +58,7 @@ class CreateMemberPopup {
   Location location = Location("", "");
   DateTime dob;
   TshirtSize size;
+  bool isDirectoryMember = true;
 
   CreateMemberPopup(this.context, this.setState, this._onPressed);
 
@@ -85,7 +86,7 @@ class CreateMemberPopup {
     if(size == null)
       error += "Please select a tshirt size\n";
     else
-      error += "To submit a new member, all fields must be entered.\n\nPlease fill in all fields (including birthday) and submit again.";
+      error += "\n\nTo submit a new member, all fields must be entered.\nPlease fill in all fields (including birthday) and submit again.";
 
     // set up the button
     Widget okButton = TextButton(
@@ -280,43 +281,67 @@ class CreateMemberPopup {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        children: [
-                          Text("Tshirt Size", style: Theme.of(context).textTheme.headline5,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
+                          padding: EdgeInsets.all(20),
+                          child: Row(
                             children: [
-                              DropdownButton(
-                                hint: Text("Select Size"),
-                                value: size,
-                                dropdownColor: Colors.white,
-                                style: TextStyle(color: Colors.black),
-                                items: List.generate(TshirtSize.values.length, (index) {
-                                  return DropdownMenuItem<TshirtSize>(
-                                    value: TshirtSize.values.elementAt(index), 
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        TshirtSize.values.elementAt(index).toString().split('.')[1].split("_").join(" "),
-                                        style: TextStyle(
-                                          color: Colors.black
-                                        ),
-                                      ),
-                                    )
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Checkbox(value: isDirectoryMember, onChanged: (changed) {
+                                  setState2(
+                                    () {
+                                      isDirectoryMember = changed;
+                                    }
                                   );
                                 }),
-                                onChanged: (newSize) {
-                                  setState2(() {
-                                    size = newSize;
-                                  });
-                                },
+                              ),
+                              Text("Add to Directory?", style: Theme.of(context).textTheme.headline5,),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            children: [
+                              Text("Tshirt Size", style: Theme.of(context).textTheme.headline5,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  DropdownButton(
+                                    hint: Text("Select Size"),
+                                    value: size,
+                                    dropdownColor: Colors.white,
+                                    style: TextStyle(color: Colors.black),
+                                    items: List.generate(TshirtSize.values.length, (index) {
+                                      return DropdownMenuItem<TshirtSize>(
+                                        value: TshirtSize.values.elementAt(index), 
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            TshirtSize.values.elementAt(index).toString().split('.')[1].split("_").join(" "),
+                                            style: TextStyle(
+                                              color: Colors.black
+                                            ),
+                                          ),
+                                        )
+                                      );
+                                    }),
+                                    onChanged: (newSize) {
+                                      setState2(() {
+                                        size = newSize;
+                                      });
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -326,7 +351,7 @@ class CreateMemberPopup {
                           child: ElevatedButton(
                             onPressed: () async {
                               if(valid()) {
-                                _onPressed.call(name, email, number, location, dob, size);
+                                _onPressed.call(name, email, number, location, dob, size, isDirectoryMember);
                               }
                               else {
                                 showAlertDialog(context);
@@ -450,13 +475,41 @@ class CreateMemberPopup {
                       child: ElevatedButton(
                         onPressed: () async {
                           if(valid()) {
-                            _onPressed.call(name, email, number, location, dob, size);
+                            await showDialog(
+                              context: context, 
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Add To Directory?"),
+                                  content: Text(
+                                    "Is this account a Teague Family Member that should be added to the directory?",
+                                    style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.black),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => {
+                                        _onPressed.call(name, email, number, location, dob, size, true),
+                                        Navigator.of(context).pop()
+                                      },
+                                      child: Text("Yes")
+                                    ),
+                                    TextButton(
+                                      onPressed: () => {
+                                        _onPressed.call(name, email, number, location, dob, size, false),
+                                        Navigator.of(context).pop()
+                                      },
+                                      child: Text("No")
+                                    ),
+                                  ],
+                                );
+                              } 
+                            );
+
                           }
                           else {
                             showAlertDialog(context);
                           }
                         }, 
-                        child: Text("Create")
+                        child: Text("Next")
                       ),
                     ),
                   ]
@@ -606,13 +659,21 @@ class FamilyMember{
   AssessmentStatus assessmentStatus = AssessmentStatus();
   TshirtSize tSize;
   Verification verification;
+  bool isDirectoryMember = true;
 
   bool registered = false;
   DateTime registeredDate;
 
   FamilyMember(this.name, this.email, this.location, this.dob) {
     age = Age.dateDifference(fromDate: dob, toDate: DateTime.now());
-    tier = age.years > 13 ? FamilyMemberTier.Adult : FamilyMemberTier.Child; 
+    if(age.years > 11) {
+      tier = FamilyMemberTier.Adult;
+    }
+    else if(age.years > 4) {
+      tier = FamilyMemberTier.Child;
+    }
+    else
+      tier = FamilyMemberTier.Baby;
   }
 
   FamilyMember addPhone(String givenPhone) { phone = givenPhone; return this; }
@@ -660,12 +721,14 @@ class FamilyMember{
         "email": member.verification.email
       };
     }
+    object['isDirectoryMember'] = member.isDirectoryMember;
 
     return object;
 
   }
 
   static Future<FamilyMember> toMember(Map<String, dynamic> object) async {
+    
     String name = object['name'];
     String email = object['email'];
     Location location = Location(
@@ -690,6 +753,9 @@ class FamilyMember{
     }
     if(object.containsKey("verification")) {
       ret.verification = Verification(object['verification']['verifiedId'], object['verification']['email']);
+    }
+    if(object['isDirectoryMember'] == false) {
+      ret.isDirectoryMember = false;
     }
     ret.addPhone(phone);
     ret.assessmentStatus = assessmentStatus;
@@ -812,16 +878,30 @@ class InvoiceItems{
       Map<String, Object> temp = {}; 
       
       temp["name"] = theMember.tier.toString().split('.').last + " Assessment";
-      temp["description"] = "KC Teague 2022 Assessment for: ${theMember.name} (${theMember.id})";
+      String item = theMember.tier == FamilyMemberTier.Baby ? "Tshirt Purchase" : "Assessment";
+      temp["description"] = "KC Teague 2022 $item for: ${theMember.name} (${theMember.id})";
       temp["quantity"] = "1";
+      var cost;
+      switch (theMember.tier) {
+        case FamilyMemberTier.Adult:
+          cost = 100;
+          break;
+        case FamilyMemberTier.Child:
+          cost = 25;
+          break;
+        case FamilyMemberTier.Baby:
+          cost = 10;
+          break;
+        default:
+      } 
       temp["unit_amount"] = {
         "currency_code": "USD",
-        "value": (theMember.tier == FamilyMemberTier.Adult ? 100.00 : 25.00).toStringAsFixed(2)
+        "value": cost.toStringAsFixed(2)
       };
-      // temp["tax"] = {
-      //   "name": "Sales Tax",
-      //   "percent": "3.99",
-      // };
+      temp["tax"] = {
+        "name": "Sales Tax",
+        "percent": "3.99",
+      };
 
       ret.add(temp);
 
@@ -866,8 +946,21 @@ class InvoiceItems{
 
     double total = 0;
 
-    assessments.forEach((member) { 
-      total += (member.tier == FamilyMemberTier.Adult ? 100 : 25);
+    assessments.forEach((member) {
+      var toAdd;
+      switch (member.tier) {
+        case FamilyMemberTier.Adult:
+          toAdd = 100;
+          break;
+        case FamilyMemberTier.Child:
+          toAdd = 25;
+          break;
+        case FamilyMemberTier.Baby:
+          toAdd = 10;
+          break;
+        default:
+      }
+      total += toAdd;
     });
 
     return total;

@@ -760,7 +760,7 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   void showCreateMembers() {
 
-    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize) {
+    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize, isDirectoryMember) {
       List<FamilyMember> membersToAdd = [];
       membersToAdd.add(
         FamilyMember(name.text, email.text, location, dob)
@@ -769,8 +769,11 @@ class _PaymentsPage extends State<PaymentsPage> {
         (member) {
           setState(() {
             member.addPhone(number.text);
-            member.id = ref.push(FamilyMember.toMap(member)).key;
             member.tSize = tSize;
+            if(!isDirectoryMember) {
+              member.isDirectoryMember = false;
+            }
+            member.id = ref.push(FamilyMember.toMap(member)).key;
             choices.add(member);
             selected[member] = true;
           });
