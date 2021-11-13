@@ -2,11 +2,13 @@ import 'dart:developer';
 
 import 'package:firebase/firebase.dart' as firebase;
 import 'package:firebase/firebase.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_teague_app/Objects.dart';
 import 'package:project_teague_app/activitiesPage.dart';
 import 'package:project_teague_app/configure_web.dart';
 import 'package:project_teague_app/directorypage.dart';
+import 'package:project_teague_app/faqpage.dart';
 import 'package:project_teague_app/paymentsPage.dart';
 import 'homepage.dart';
 import 'signIn.dart';
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'KC Teague Family Reunion Site',
+      title: 'KC Teague Reunion Site',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: TextTheme(
@@ -66,7 +68,7 @@ class _AppState extends State<App> {
   SignIn signIn;
   String displayName = "Anon User";
 
-  Widget pageBody;
+  StatefulWidget pageBody;
   String pageTitle;
 
   List<FamilyMember> members = [];
@@ -77,21 +79,28 @@ class _AppState extends State<App> {
 
   @override
   void initState() {
+    
     super.initState();
+
     this.signIn = SignIn();
-    pageTitle = "Home";
-    pageBody = HomePage(signIn, navigate);
+    
     Database db = database();
     ref = db.ref('members');
 
-    Function func = (String name) {
+    Function func = (String name) async {
       setState(() {
         displayName = name;
       });
-      checkUser();
+      await checkUser();
     };
 
+    setState(() {
+      pageBody = HomePage(signIn, navigate);
+      pageTitle = "Home";
+    });
+
     signIn.listener(func);
+
   }
 
   @override
@@ -153,24 +162,24 @@ class _AppState extends State<App> {
 
   }
 
-  void checkUser() async {
+  Future<void> checkUser() async {
 
-    ref.orderByChild("verification/verifiedId").equalTo(signIn.currentUser.id)
+    return await ref.orderByChild("verification/verifiedId").equalTo(signIn.currentUser.id)
     .limitToFirst(1).once('value').then(
       (value) async {
         if(value.snapshot.val()==null) {
-          assignMember();
+          await assignMember();
         }
       }
     );
 
   }
 
-  void assignMember() async {
+  Future<void> assignMember() async {
     
     await loadMembers();
 
-    showGeneralDialog(
+    return showGeneralDialog(
       context: context, 
       barrierDismissible: false,
       pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondAnimation) {
@@ -191,7 +200,10 @@ class _AppState extends State<App> {
                             padding: const EdgeInsets.all(20.0),
                             child: Text(
                               "Select Your Name",
-                              style: TextStyle(fontWeight: FontWeight.bold)
+                              style: Theme.of(context).textTheme.headline4.copyWith(
+                                color: Colors.black,
+                                decoration: TextDecoration.underline  
+                              ),
                             ),
                           ),
                           Padding(
@@ -245,8 +257,11 @@ class _AppState extends State<App> {
                                 padding: const EdgeInsets.all(20.0),
                                 child: Center(
                                   child: Text(
-                                    "Or, If You Are New,\nCreate Your Account",
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    "Or Create Your Account",
+                                    style: Theme.of(context).textTheme.headline4.copyWith(
+                                      color: Colors.black,
+                                      decoration: TextDecoration.underline  
+                                    ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -298,35 +313,35 @@ class _AppState extends State<App> {
 
   }
 
-  void navigate(int page) {
+  void navigate(MenuPage page) {
 
-    if(page == current) {
-      return;
-    }
-    else{
-      current = page;
-    }
+    checkSize();
 
     Widget tempPage;
     String tempTitle;
 
     switch (page) {
-      case 0:
+      case MenuPage.Home:
           tempPage = HomePage(signIn, navigate);
           tempTitle = 'Home';
         break;
-      case 1: 
+      case MenuPage.Directory: 
           tempPage = DirectoryPage();
           tempTitle = 'Directory';
         break;
-      case 2: 
+      case MenuPage.Activities: 
         tempPage = ActivitiesPage(signIn);
         tempTitle = 'Activities Poll';
         break;
-      case 3: 
+      case MenuPage.Registration: 
         tempPage = PaymentsPage(signIn);
         tempTitle = 'Registration';
-      break;
+        break;
+      case MenuPage.FAQ: 
+        tempPage = FaqPage();
+        tempTitle = 'FAQS';
+        break;
+      default:
     }
 
     setState(() {
@@ -347,7 +362,7 @@ class _AppState extends State<App> {
         padding = 4;
         break;
       default:
-        padding = 2;
+        padding = 0;
     }
 
     return Container(
@@ -360,23 +375,23 @@ class _AppState extends State<App> {
             padding: EdgeInsets.all(padding),
             child: TextButton(
               child: Text('Home'),
-              onPressed: () { navigate(0); },
+              onPressed: () { navigate(MenuPage.Home); },
             ),
           ),
           
           Padding(
             padding: EdgeInsets.all(padding),
             child: TextButton(
-              child: Text('Directory'),
-              onPressed: () { navigate(1); }
+              child: Text(getType(context) != ScreenType.Handset ?'Directory' : "Dir."),
+              onPressed: () { navigate(MenuPage.Directory); }
             ),
           ),
 
           Padding(
             padding: EdgeInsets.all(padding),
             child: TextButton(
-              child: Text('Activites Poll'),
-              onPressed: () { navigate(2); },
+              child: Text(getType(context) != ScreenType.Handset ? 'Activites Poll' : "Act."),
+              onPressed: () { navigate(MenuPage.Activities); },
             ),
           ),
 
@@ -384,7 +399,15 @@ class _AppState extends State<App> {
             padding: EdgeInsets.all(padding),
             child: TextButton(
               child: Text('Registration'),
-              onPressed: () { navigate(3); },
+              onPressed: () { navigate(MenuPage.Registration); },
+            ),
+          ),
+
+          Padding(
+            padding: EdgeInsets.all(padding),
+            child: TextButton(
+              child: Text('FAQS'),
+              onPressed: () { navigate(MenuPage.FAQ); },
             ),
           ),
 

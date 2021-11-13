@@ -87,7 +87,7 @@ class _PaymentsPage extends State<PaymentsPage> {
           hoh.assessmentStatus.created = true;
           hoh.assessmentStatus.invoiceId = invoice.id;
           hoh.assessmentStatus.invoice = invoice;
-          hoh.assessmentStatus.position = AssessmentPosition.hoh;
+          hoh.assessmentStatus.position = AssessmentPosition.Hoh;
           setState(() {
             itemList = invoice.items.createItemList();
             paymentList = invoice.payments;
@@ -102,7 +102,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               member.assessmentStatus.created = true;
               member.assessmentStatus.invoiceId = invoice.id;
               member.assessmentStatus.invoice = invoice;
-              member.assessmentStatus.position = AssessmentPosition.participant;
+              member.assessmentStatus.position = AssessmentPosition.Participant;
               ref.child(member.id).set(FamilyMember.toMap(member));
             }
           });
@@ -132,7 +132,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               member.assessmentStatus.created = true;
               member.assessmentStatus.invoiceId = current.assessmentStatus.invoice.id;
               member.assessmentStatus.invoice = current.assessmentStatus.invoice;
-              member.assessmentStatus.position = AssessmentPosition.participant;
+              member.assessmentStatus.position = AssessmentPosition.Participant;
               ref.child(member.id).update({'assessmentStatus': AssessmentStatus.toMap(member.assessmentStatus)});
             }
           });
@@ -175,11 +175,13 @@ class _PaymentsPage extends State<PaymentsPage> {
         current = await FamilyMember.toMember(
           query.snapshot.val().entries.firstWhere(
             (e) {
+              print(e.value);
               id = e.key;
               return e.value['verification'] != null && e.value['verification']['verifiedId']==signIn.currentUser.id;
             }
           ).value
         );
+        print(current.name);
         current.id = id;
 
         if(current.assessmentStatus.created) {
@@ -227,7 +229,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               Padding(
                 padding: EdgeInsets.all(6),
                 child: Text(                
-                  "Please Select Every Member of Your Family That's Attending the Reunion",
+                  "Please 'Create A Family Member' For Each Person Attending the Reunion.\nThis Will Add Them To Your Registration",
                   style: Theme.of(context).textTheme.headline4.copyWith(
                     color: Colors.black
                   ),
@@ -237,7 +239,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               Padding(
                 padding: EdgeInsets.all(4),
                 child: Text(                
-                  "** If You Do Not See Someone's Name, Click the Create Button Below to Add Them to The Registry **",
+                  "** Once All Are Created, Click Submit Below To Create An Invoice **",
                   style: Theme.of(context).textTheme.headline5.copyWith(
                     color: Colors.black,
                     decoration: TextDecoration.none
@@ -274,7 +276,7 @@ class _PaymentsPage extends State<PaymentsPage> {
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: ElevatedButton(
-                  onPressed: () => showCreateMembers(),
+                  onPressed: () => showCreateMembers(setstate2),
                   child: Text("Create Family Member")
                 ),
               ),
@@ -490,7 +492,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                           //   }
                           // );
                         }, 
-                        child: Text("Register")
+                        child: Text("Submit")
                       ),
                     )
                   ]
@@ -507,13 +509,13 @@ class _PaymentsPage extends State<PaymentsPage> {
 
         Widget modifyButton = ElevatedButton(
           onPressed: () => modifyItems(),
-          child: Text("Modify Items")
+          child: Text("Modify Registration")
         );
         Widget tooltipButton = Tooltip(
           message: "Only the Head of Household is able to modify the registration",
           child: ElevatedButton(
             onPressed: null,
-            child: Text("Modify Items"),
+            child: Text("Modify Registration"),
           ),
         );
 
@@ -654,24 +656,44 @@ class _PaymentsPage extends State<PaymentsPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                launch(current.assessmentStatus.invoice.link.toString());
-                              },
-                              child: Text(
-                                "Make Payment"
-                              ) 
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(4),
+                                child: Text(                
+                                  "If You Would Like To Add/Remove More Family Members, Click Modify",
+                                  style: Theme.of(context).textTheme.headline5.copyWith(
+                                    color: Colors.black,
+                                    decoration: TextDecoration.none
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: current.assessmentStatus.position == AssessmentPosition.hoh ? modifyButton : tooltipButton
-                          )
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    launch(current.assessmentStatus.invoice.link.toString());
+                                  },
+                                  child: Text(
+                                    "Make Payment"
+                                  ) 
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: current.assessmentStatus.position == AssessmentPosition.Hoh ? modifyButton : tooltipButton
+                              )
+                            ],
+                          ),
                         ],
                       ),
                     )
@@ -758,16 +780,16 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   }
 
-  void showCreateMembers() {
+  void showCreateMembers(Function setState2) {
 
-    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize, isDirectoryMember) {
+    CreateMemberPopup(context, setState2, (name, email, number, location, dob, tSize, isDirectoryMember) {
       List<FamilyMember> membersToAdd = [];
       membersToAdd.add(
         FamilyMember(name.text, email.text, location, dob)
       );
       membersToAdd.forEach(
         (member) {
-          setState(() {
+          setState2(() {
             member.addPhone(number.text);
             member.tSize = tSize;
             if(!isDirectoryMember) {
@@ -775,6 +797,7 @@ class _PaymentsPage extends State<PaymentsPage> {
             }
             member.id = ref.push(FamilyMember.toMap(member)).key;
             choices.add(member);
+            items.addMember(member);
             selected[member] = true;
           });
         }

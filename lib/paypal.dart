@@ -4,6 +4,38 @@ import 'package:project_teague_app/Objects.dart';
 import 'package:flutter/material.dart';
 import 'package:http_auth/http_auth.dart';
 
+import 'package:flutter/material.dart';
+
+
+// class PayPalWidget extends StatefulWidget {
+
+//   double amt;
+//   PayPalWidget(this.amt);
+
+//   @override
+//   _PayPalState createState() => _PayPalState();
+// }
+
+// class _PayPalState extends State<PayPalWidget> {
+//   html.IFrameElement _element;
+
+//   @override
+//   void initState() {
+    
+
+//     super.initState();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: 220,
+//       height: 220,
+//       child: HtmlElementView(viewType: 'PayPalButtons'),
+//     );
+//   }
+// }
+
 class Paypal {
 
   String domain = "https://api-m.paypal.com"; // for production mode
@@ -18,6 +50,43 @@ class Paypal {
 
   Paypal(this.context) {
     client = BasicAuthClient(clientId, secret);
+  }
+
+  Future<String> createOrder(TshirtOrder shirtOrder) async {
+
+    var retLink = "";
+
+    await client.post(Uri.parse('$domain/v2/checkout/orders'),
+      headers: {"Content-Type": "application/json",}, 
+      body: json.encode(
+        {
+          "intent": "CAPTURE",
+          "purchase_units": [
+            {
+              "amount": {
+                "currency_code": "USD",
+                "value": shirtOrder.getTotal().toStringAsFixed(2)
+              }
+            }
+          ]
+        }
+      )
+    ).then((res) {
+
+      if(res.statusCode != 201) {
+        throw PaypalError(res);
+      }
+
+      for (var link in json.decode(res.body)['links']) {
+        if(link['rel'] == "approve") {
+          retLink = link['href'];
+        }
+      }
+
+    });
+
+    return retLink;
+
   }
 
   Future<Invoice> createInvoice(FamilyMember hoh, InvoiceItems items) async {
@@ -88,10 +157,6 @@ class Paypal {
           "configuration": {
             "partial_payment": {
               "allow_partial_payment": true,
-              "minimum_amount_due": {
-                "currency_code": "USD",
-                "value": "20.00"
-              }
             },
             
             "allow_tip": false,
@@ -207,10 +272,6 @@ class Paypal {
           "configuration": {
             "partial_payment": {
               "allow_partial_payment": true,
-              "minimum_amount_due": {
-                "currency_code": "USD",
-                "value": "20.00"
-              }
             },
             "allow_tip": false,
             "tax_inclusive": false,

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:quiver/core.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum Activity {
   Riverwalk, Alamo, SixFlags, SeaWorld,
@@ -12,9 +13,13 @@ enum Activity {
   Splashtown, Escape, Aquatica
 }
 
+enum MenuPage {
+  Home, Directory, Activities, Registration, FAQ 
+}
+
 enum AssessmentPosition {
 
-  hoh, participant
+  Hoh, Participant
 
 }
 
@@ -23,7 +28,7 @@ enum FamilyMemberTier {
 }
 
 enum InvoiceStatus {
-  complete, inProgress, sent, cancelled, other
+  Complete, InProgress, Sent, Cancelled, Other
 }
 
 enum ScreenType { Watch, Handset, Tablet, Desktop }
@@ -31,6 +36,11 @@ enum ScreenType { Watch, Handset, Tablet, Desktop }
 enum TshirtSize { 
   Youth_XS, Youth_S, Youth_M, Youth_L, Youth_XL,
   S, M, L, XL, XXL, XXXL, XXXXL
+}
+
+enum InputError {
+  Name, Email, Number, Member_Shirt, Order_Shirt, 
+  Location, DoB, Delivery
 }
 
 ScreenType getType(BuildContext context) {
@@ -45,6 +55,98 @@ ScreenType getType(BuildContext context) {
  return ScreenType.Watch;
 
 }
+
+void showErrorDialog(BuildContext context, String title, List<InputError> errors) {
+
+  List<String> outputList = [];
+
+  for (InputError error in errors) {
+    switch (error) {
+      case InputError.Name:
+        outputList.add("Please enter a valid name");
+        break;
+      case InputError.Number:
+        outputList.add("Please enter a valid phone number");
+        break;
+      case InputError.Email:
+        outputList.add("Please enter a valid email address");
+        break;
+      case InputError.Member_Shirt:
+        outputList.add("Please select a T-Shirt size");
+        break;
+      case InputError.Order_Shirt:
+        outputList.add("Please select a size for each T-Shirt, or remove extras");
+        break;
+      case InputError.Location:
+        outputList.add("Please enter a valid location");
+        break;
+      case InputError.Delivery:
+        outputList.add("Please enter a valid delivery address, or select 'Pick up'");
+        break;
+      default:
+    }
+  }
+
+  // set up the button
+  Widget okButton = TextButton(
+    child: Text("OK"),
+    onPressed: () { Navigator.pop(context); },
+  );
+
+  // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: Text(title),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        outputList.length,
+        (index) {
+          return Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(3.0),
+                child: MyBullet(),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(3.0),
+                child: Text(
+                  outputList.elementAt(index), style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ],
+          );
+        }
+      ),
+    ), 
+    actions: [
+      okButton,
+    ],
+  );
+
+  // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+
+}
+
+class UrlLauncher {
+
+  static Widget tryLaunch(String text, String url) {
+
+    void _launch() async {
+      await canLaunch(url) ? await launch(url) : print("cant launch $url");
+
+    }
+
+    return InkWell(child: Text(text), onTap: _launch,);
+
+  }
+
+} 
 
 class CreateMemberPopup {
   
@@ -64,54 +166,34 @@ class CreateMemberPopup {
 
   bool valid() {
 
-    if(name.text.length > 0 && email.text.contains("@") && location.state != null && location.city != null
-      && dob != null && number.text.length == 10 && size != null
-    ) {
+    List<InputError> errors = [];
+
+    if(name.text.length < 1) {
+      errors.add(InputError.Name);
+    } 
+    if(!email.text.contains("@")) {
+      errors.add(InputError.Email);
+    }
+    if(location.state == null) {
+      errors.add(InputError.Location);
+    }
+    if(dob == null) {
+      errors.add(InputError.DoB);
+    } 
+    if(number.text.length != 10) {
+      errors.add(InputError.Number);
+    } 
+    if(size == null) {
+      errors.add(InputError.Member_Shirt);
+    }
+     
+    if(errors.isEmpty) {
       return true;
     }
     else {
+      showErrorDialog(context, "Create Member Error", errors);
       return false;      
     }
-
-  }
-
-  Future showAlertDialog(BuildContext context2) {
-
-    String error = "";
-
-    if(number.text.length != 10)
-      error += "Please enter a valid phone number\n";
-    if(!email.text.contains("@"))
-      error += "Please enter a valid email address\n";
-    if(size == null)
-      error += "Please select a tshirt size\n";
-    else
-      error += "\n\nTo submit a new member, all fields must be entered.\nPlease fill in all fields (including birthday) and submit again.";
-
-    // set up the button
-    Widget okButton = TextButton(
-      child: Text("OK"),
-      onPressed: () { Navigator.pop(context2); },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Create Member Error"),
-      content: Text(
-        error, style: TextStyle(color: Colors.black),
-      ),
-      actions: [
-        okButton,
-      ],
-    );
-
-    // show the dialog
-    return showDialog(
-      context: context2,
-      builder: (BuildContext context2) {
-        return alert;
-      },
-    );
 
   }
 
@@ -290,7 +372,7 @@ class CreateMemberPopup {
                           child: Row(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 50),
                                 child: Checkbox(value: isDirectoryMember, onChanged: (changed) {
                                   setState2(
                                     () {
@@ -304,7 +386,7 @@ class CreateMemberPopup {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 50),
                           child: Column(
                             children: [
                               Text("Tshirt Size", style: Theme.of(context).textTheme.headline5,),
@@ -352,9 +434,6 @@ class CreateMemberPopup {
                             onPressed: () async {
                               if(valid()) {
                                 _onPressed.call(name, email, number, location, dob, size, isDirectoryMember);
-                              }
-                              else {
-                                showAlertDialog(context);
                               }
                             },
                             child: Text("Create")
@@ -481,7 +560,7 @@ class CreateMemberPopup {
                                 return AlertDialog(
                                   title: Text("Add To Directory?"),
                                   content: Text(
-                                    "Is this account a Teague Family Member that should be added to the directory?",
+                                    "Is this person a Teague Family Member that should be added to the directory?",
                                     style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.black),
                                   ),
                                   actions: [
@@ -504,9 +583,6 @@ class CreateMemberPopup {
                               } 
                             );
 
-                          }
-                          else {
-                            showAlertDialog(context);
                           }
                         }, 
                         child: Text("Next")
@@ -573,7 +649,10 @@ class AssessmentStatus {
     ret.created = created;
     if(ret.created) {
       ret.invoiceId = object["invoiceId"];
-      ret.position = AssessmentPosition.values.firstWhere((pos) => pos.toString() == "AssessmentPosition." + object['position']);
+      ret.position = AssessmentPosition.values.firstWhere(
+        (pos) => 
+          pos.toString().toLowerCase() == "AssessmentPosition.".toLowerCase() + object['position'].toString().toLowerCase()
+      );
     }    
 
     return ret; 
@@ -611,6 +690,15 @@ class CarouselItem extends StatelessWidget {
 
 }
 
+class TshirtDelivery {
+
+  bool needDelivery = true;
+
+  String address = "";
+
+
+}
+
 class Location {
 
   String state;
@@ -619,6 +707,17 @@ class Location {
   Location(this.state, this.city);
 
   String displayInfo() => city + ", " + state;
+
+}
+
+class FAQ {
+
+  String question;
+  String answer;
+
+  FAQ(
+    this.question, this.answer
+  );
 
 }
 
@@ -634,6 +733,47 @@ class MyBullet extends StatelessWidget{
         shape: BoxShape.circle,
       ),
     );
+  }
+
+}
+
+class TshirtOrder {
+
+  String orderName = "";
+  String orderEmail = "";
+
+  TshirtDelivery delivery = TshirtDelivery();
+
+  List<TshirtSize> shirts = [];
+
+  TshirtOrder();
+
+  double getTotal() {
+
+    double total = 0;
+    for (TshirtSize shirt in shirts) {
+      
+      if(shirt==null) {
+        continue;
+      }
+      
+      switch (shirt) {
+        case TshirtSize.Youth_XS:
+        case TshirtSize.Youth_XL:
+        case TshirtSize.Youth_S:
+        case TshirtSize.Youth_M:
+        case TshirtSize.Youth_L:
+          total += 10;
+          break;
+        default:
+          total += 12;
+          break;
+      }
+
+    }
+
+    return total;
+
   }
 
 }
@@ -731,9 +871,13 @@ class FamilyMember{
     
     String name = object['name'];
     String email = object['email'];
+    String state = object['location']['state'];
+    String city = "";
+    if(object['location']['city'] != null) {
+      city = object['location']['city'];
+    }
     Location location = Location(
-      object['location']['state'],
-      object['location']['city']
+      state, city
     );
     String phone = object['phone'];
     DateTime dob = DateTime.fromMillisecondsSinceEpoch(object['dob']);
@@ -792,19 +936,20 @@ class Invoice{
     
     switch (object["status"]) {
       case "SENT":
-        status = InvoiceStatus.sent;
+        status = InvoiceStatus.Sent;
         break;
+      case "MARKED_AS_PAID":
       case "PARTIALLY_PAID":
-        status = InvoiceStatus.inProgress;
+        status = InvoiceStatus.InProgress;
         break;
       case "PAID":
-        status = InvoiceStatus.complete;
+        status = InvoiceStatus.Complete;
         break;
       case "CANCELLED":
-        status = InvoiceStatus.cancelled;
+        status = InvoiceStatus.Cancelled;
         break;
       default:
-        status = InvoiceStatus.other;
+        status = InvoiceStatus.Other;
     }
 
     DateTime startedDate = DateFormat("yyyy-MM-dd").parse(details["invoice_date"]);
@@ -815,6 +960,7 @@ class Invoice{
     InvoiceItems items = InvoiceItems();
     for (var item in object["items"]) {
       switch (item["name"]) {
+        case "Tshirt Purchase":
         case "Child Assessment":
         case "Adult Assessment":
           var split = item["description"].toString().split(': ').last.split(" (");
@@ -877,8 +1023,8 @@ class InvoiceItems{
 
       Map<String, Object> temp = {}; 
       
-      temp["name"] = theMember.tier.toString().split('.').last + " Assessment";
-      String item = theMember.tier == FamilyMemberTier.Baby ? "Tshirt Purchase" : "Assessment";
+      temp["name"] = theMember.tier == FamilyMemberTier.Baby ? "T-Shirt Purchase" : theMember.tier.toString().split('.').last + " Assessment";
+      String item = theMember.tier == FamilyMemberTier.Baby ? "T-Shirt Purchase" : "Assessment";
       temp["description"] = "KC Teague 2022 $item for: ${theMember.name} (${theMember.id})";
       temp["quantity"] = "1";
       var cost;
@@ -887,7 +1033,7 @@ class InvoiceItems{
           cost = 100;
           break;
         case FamilyMemberTier.Child:
-          cost = 25;
+          cost = 30;
           break;
         case FamilyMemberTier.Baby:
           cost = 10;
@@ -897,10 +1043,6 @@ class InvoiceItems{
       temp["unit_amount"] = {
         "currency_code": "USD",
         "value": cost.toStringAsFixed(2)
-      };
-      temp["tax"] = {
-        "name": "Sales Tax",
-        "percent": "3.99",
       };
 
       ret.add(temp);
@@ -956,7 +1098,7 @@ class InvoiceItems{
           toAdd = 25;
           break;
         case FamilyMemberTier.Baby:
-          toAdd = 10;
+          toAdd = 8;
           break;
         default:
       }

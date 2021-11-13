@@ -160,7 +160,7 @@ class _ActivitiesPage extends State<ActivitiesPage> {
                 child: SelectableText(
                   "There are a lot of FUN things to do in San Antonio and we've compiled a list of activities. "
                   + "Please note all prices listed are the current 2021 prices and are SUBJECT TO CHANGE for 2022. "
-                  + "Since this is our FAMILY REUNION, and we'd be able to get group rate discounts, we would like to do some of the activities as a group. "
+                  + "Since this is our FAMILY REUNION, we would like to do some of the activities as a group, and we'd be able to get group rate discounts. "
                   + "With that in mind we are asking everyone to select their top (4) choices and the ones with the most votes will be the activities we do as a group."
                   + " Select from the following list, and then click the submit button below to view the results.",
                   textAlign: TextAlign.center,

@@ -36,7 +36,8 @@ class _HomePage extends State<HomePage> {
       items.addAll([
         CarouselItem(OverviewSlide(context, navigate), sliderController),
         CarouselItem(HotelSlide(context), sliderController),
-        CarouselItem(ActivitiesSlide(context, navigate), sliderController)
+        CarouselItem(ActivitiesSlide(context, navigate), sliderController),
+        CarouselItem(TshirtFormSlide(context, navigate), sliderController)
       ]);    
     }); 
 
@@ -71,7 +72,7 @@ class _HomePage extends State<HomePage> {
               carouselController: sliderController,
               options: CarouselOptions(
                 aspectRatio: aspect,
-                enlargeCenterPage: true,
+                // enlargeCenterPage: true,
                 viewportFraction: 1,
               )
             ),
