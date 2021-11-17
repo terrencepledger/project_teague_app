@@ -175,7 +175,6 @@ class _PaymentsPage extends State<PaymentsPage> {
         current = await FamilyMember.toMember(
           query.snapshot.val().entries.firstWhere(
             (e) {
-              print(e.value);
               id = e.key;
               return e.value['verification'] != null && e.value['verification']['verifiedId']==signIn.currentUser.id;
             }

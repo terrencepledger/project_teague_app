@@ -71,7 +71,6 @@ class _ActivitiesPage extends State<ActivitiesPage> {
       PollOptions('Double Decker Bus Tour', fontSize, _padding, Activity.Bus),
       PollOptions('San Marcos Outlet', fontSize, _padding, Activity.Shopping),
       PollOptions("Ripley's Believe It or Not", fontSize, _padding, Activity.Ripleys),
-      PollOptions('Splashtown Waterpark', fontSize, _padding, Activity.Splashtown),
       PollOptions('Extreme Escape', fontSize, _padding, Activity.Escape),
       PollOptions('Aquatica', fontSize, _padding, Activity.Aquatica),
       PollOptions('Shopping', fontSize, _padding, Activity.Shopping),

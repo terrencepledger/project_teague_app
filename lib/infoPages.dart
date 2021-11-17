@@ -168,6 +168,155 @@ class _OverviewSlideState extends State<OverviewSlide> {
 
 }
 
+class ItinerarySlide extends StatefulWidget {
+  
+  BuildContext context;
+
+  Function navigate;
+
+  double textSize;
+
+  ItinerarySlide(this.context, this.navigate, {Key key}) : super(key: key);
+
+  @override
+  _ItinerarySlideState createState() => _ItinerarySlideState();
+
+}
+
+class _ItinerarySlideState extends State<ItinerarySlide> {
+  
+  void checkSize() {
+
+    double tempTextSize;
+
+    switch (getType(widget.context)) {
+      case ScreenType.Desktop:
+        tempTextSize = 30;
+        break;
+      case ScreenType.Tablet:
+        tempTextSize = 22;
+        break;
+      default:
+        tempTextSize = 16;
+    }
+
+    setState(() {
+      widget.textSize = tempTextSize;
+    });
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    
+    checkSize();
+    
+    return Container(
+      constraints: BoxConstraints.expand(),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomLeft,
+          end: Alignment.topLeft,
+          colors: const [Colors.lightBlueAccent, Colors.white30, Colors.white30, Colors.lightBlueAccent])),
+      child: Padding(
+        padding:
+          new EdgeInsets.only(top:10, right: 25, bottom: 30, left: 30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            FittedBox(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SelectableText(
+                    "Weekend Itinerary",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: widget.textSize + 12
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Spacer(),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FittedBox(
+                  child: SelectableText(
+                    "\Friday - Meet and Greet, Sign In, T-Shirt Pick Up",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "A time to reconnect with familiar faces",
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "and meet new family members!",
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "\nSaturday - A Day Full of Fun in the Sun",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "Let's get out and explore",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "San Antonio together!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "\nSunday - Banquet",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Spacer(),
+            Spacer()
+          ]
+        ),
+      ),
+    );
+  
+  }
+
+}
+
 class HotelSlide extends StatefulWidget {
 
   BuildContext context;
@@ -495,6 +644,72 @@ class _ActivitiesSlideState extends State<ActivitiesSlide> {
                     TextSpan(
                       children: [
                         TextSpan(
+                          text: "Natural Bridge Caverns",
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade800,
+                            fontSize: widget.textSize
+                          ),
+                          recognizer: new TapGestureRecognizer()
+                            ..onTap = () {
+                              launch("https://naturalbridgecaverns.com/");
+                          }
+                        ),
+                        TextSpan(
+                          text: " - Adult zip rails & rope course: \$26.99;\n",
+                          style: TextStyle(
+                            fontSize: widget.textSize
+                          )
+                        ),
+                        TextSpan(
+                          text: "Tykes zip & rope course: \$8.99; Maze: \$9.99;\n",
+                          style: TextStyle(
+                            fontSize: widget.textSize
+                          )
+                        ),
+                        TextSpan(
+                          text: "Climbing walls: \$9.99,\n",
+                          style: TextStyle(
+                            fontSize: widget.textSize
+                          )
+                        ),
+                      ]
+                    )
+                  ),
+                ),
+                FittedBox(
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Ripley's 4D Movie Theater",
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade800,
+                            fontSize: widget.textSize
+                          ),
+                          recognizer: new TapGestureRecognizer()
+                            ..onTap = () {
+                              launch("https://www.ripleys.com/sanantonio/attractions/moving-theater/");
+                          }
+                        ),
+                        TextSpan(
+                          text: " - ages 3 - 11 \$8.99 (must be over 43\") / ages 12+ \$14.99,\n",
+                          style: TextStyle(
+                            fontSize: widget.textSize
+                          )
+                        ),
+                      ]
+                    )
+                  ),
+                ),
+                FittedBox(
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
                           text: "The Alamo Tour",
                           style: TextStyle(
                             decoration: TextDecoration.underline,
@@ -603,33 +818,6 @@ class _ActivitiesSlideState extends State<ActivitiesSlide> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: "Splashtown Waterpark",
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade800,
-                            fontSize: widget.textSize
-                          ),
-                          recognizer: new TapGestureRecognizer()
-                            ..onTap = () {
-                              launch("https://www.splashtownsa.com/");
-                          }
-                        ),
-                        TextSpan(
-                          text: " - under 48\" \$29.99 / Adults \$34.99,\n",
-                          style: TextStyle(
-                            fontSize: widget.textSize
-                          )
-                        ),
-                      ]
-                    )
-                  ),
-                ),
-                FittedBox(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
                           text: "Extreme Escape (Colonnade)",
                           style: TextStyle(
                             decoration: TextDecoration.underline,
@@ -698,66 +886,6 @@ class _ActivitiesSlideState extends State<ActivitiesSlide> {
                         ),
                         TextSpan(
                           text: " - \$37.89,\n",
-                          style: TextStyle(
-                            fontSize: widget.textSize
-                          )
-                        ),
-                      ]
-                    )
-                  ),
-                ),
-                FittedBox(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Natural Bridge Caverns",
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade800,
-                            fontSize: widget.textSize
-                          ),
-                          recognizer: new TapGestureRecognizer()
-                            ..onTap = () {
-                              launch("https://naturalbridgecaverns.com/");
-                          }
-                        ),
-                        TextSpan(
-                          text: " - Adult zip rails & rope course: \$26.99; Tykes zip rails & rope course: \$8.99;\n",
-                          style: TextStyle(
-                            fontSize: widget.textSize
-                          )
-                        ),
-                        TextSpan(
-                          text: " Maze: \$9.99; Climbing walls: \$9.99,\n",
-                          style: TextStyle(
-                            fontSize: widget.textSize
-                          )
-                        ),
-                      ]
-                    )
-                  ),
-                ),
-                FittedBox(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Ripley's Believe it or Not (4D Movie Theater)",
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade800,
-                            fontSize: widget.textSize
-                          ),
-                          recognizer: new TapGestureRecognizer()
-                            ..onTap = () {
-                              launch("https://www.ripleys.com/sanantonio/attractions/moving-theater/");
-                          }
-                        ),
-                        TextSpan(
-                          text: " - ages 3 - 11 \$8.99 (must be over 43\") / ages 12+ \$14.99,\n",
                           style: TextStyle(
                             fontSize: widget.textSize
                           )

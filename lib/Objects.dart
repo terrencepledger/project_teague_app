@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 enum Activity {
   Riverwalk, Alamo, SixFlags, SeaWorld,
   Caverns, Zoo, Bus, Shopping, Ripleys, 
-  Splashtown, Escape, Aquatica
+  Escape, Aquatica
 }
 
 enum MenuPage {
@@ -649,9 +649,12 @@ class AssessmentStatus {
     ret.created = created;
     if(ret.created) {
       ret.invoiceId = object["invoiceId"];
+      print("actual pos = " + "AssessmentPosition.".toLowerCase() + object['position'].toString().toLowerCase());
       ret.position = AssessmentPosition.values.firstWhere(
-        (pos) => 
-          pos.toString().toLowerCase() == "AssessmentPosition.".toLowerCase() + object['position'].toString().toLowerCase()
+        (pos) {
+          print(pos.toString().toLowerCase());
+          return pos.toString().toLowerCase() == "AssessmentPosition.".toLowerCase() + object['position'].toString().toLowerCase();
+        }
       );
     }    
 
@@ -960,7 +963,7 @@ class Invoice{
     InvoiceItems items = InvoiceItems();
     for (var item in object["items"]) {
       switch (item["name"]) {
-        case "Tshirt Purchase":
+        case "T-Shirt Purchase":
         case "Child Assessment":
         case "Adult Assessment":
           var split = item["description"].toString().split(': ').last.split(" (");
