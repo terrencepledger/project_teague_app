@@ -297,13 +297,22 @@ class _ItinerarySlideState extends State<ItinerarySlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "\nSunday - Banquet",
+                    "\nSunday - Banquet (A Dress Up Affair)",
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                       fontSize: widget.textSize
                     ),
                   ),
                 ),
+                FittedBox(
+                  child: SelectableText(
+                    "💎 It's time to shine! 💎",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),                
               ],
             ),
             Spacer(),
@@ -534,6 +543,128 @@ class _HotelSlideState extends State<HotelSlide> {
         //     ),
         //   ]
         // ),  
+      )  
+    );
+  }
+
+}
+
+class AirportSlide extends StatefulWidget {
+
+  BuildContext context;
+
+  double textSize;
+
+  AirportSlide(this.context, {Key key}) : super(key: key);
+
+  @override
+  _AirportSlideState createState() => _AirportSlideState();
+
+}
+
+class _AirportSlideState extends State<AirportSlide> {
+  
+  void checkSize() {
+
+    double tempTextSize;
+
+    switch (getType(widget.context)) {
+      case ScreenType.Desktop:
+        tempTextSize = 30;
+        break;
+      case ScreenType.Tablet:
+        tempTextSize = 22;
+        break;
+      default:
+        tempTextSize = 16;
+    }
+
+    setState(() {
+      widget.textSize = tempTextSize;
+    });
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    
+    checkSize();
+    
+    return Container(
+      constraints: BoxConstraints.expand(),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomLeft,
+          end: Alignment.topLeft,
+          colors: const [Colors.lightBlueAccent, Colors.white30, Colors.white30, Colors.lightBlueAccent])),
+      child: Padding(
+        padding: EdgeInsets.only(top:15, left: 10, right: 10, bottom: 30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            FittedBox(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SelectableText(
+                    "San Antonio Airport Transportation",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: widget.textSize + 12
+                    ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      text: '\nReservation Link',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade800,
+                        fontSize: widget.textSize + 8,
+                      ),
+                      recognizer: new TapGestureRecognizer()
+                        ..onTap = () {
+                          launch("https://25387.partner.viator.com//tours/San-Antonio/Arrival-Private-Transfer-San-Antonio-Airport-SAT-to-San-Antonio-by-Sedan-Car/d910-40380P842?mcid=61846");
+                      }
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Spacer(),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FittedBox(
+                  child: SelectableText(
+                    "\nPre-book a one-way private transfer service from",
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "the San Antonio International Airport (SAT) to the hotel.\n",
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "11 Adults × \$24.10 per person = \$265.10",
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Spacer()
+          ]
+        ),
       )  
     );
   }
@@ -872,7 +1003,7 @@ class _ActivitiesSlideState extends State<ActivitiesSlide> {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: "Double Decker Bus Tour",
+                          text: "River Walk and 3-Day Bus Tour",
                           style: TextStyle(
                             decoration: TextDecoration.underline,
                             fontWeight: FontWeight.bold,
@@ -881,11 +1012,11 @@ class _ActivitiesSlideState extends State<ActivitiesSlide> {
                           ),
                           recognizer: new TapGestureRecognizer()
                             ..onTap = () {
-                              launch("https://www.citysightseeingsanantonio.com/en/hop-on-hop-off-24");
+                              launch("https://25387.partner.viator.com//tours/San-Antonio/San-Antonio-River-Walk-Cruise-and-72-Hour-Hop-On-Hop-Off-Pass/d910-10152P14?mcid=61846");
                           }
                         ),
                         TextSpan(
-                          text: " - \$37.89,\n",
+                          text: " - \$49.99,\n",
                           style: TextStyle(
                             fontSize: widget.textSize
                           )
@@ -1664,38 +1795,49 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                 ],
               ),
             ),
-            Column(
-              // mainAxisSize: MainAxisSize.max,
-              children: [
-                Container(
-                  height: widget.textSize * 10,
-                  width: widget.textSize * 8,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'images/tshirt.jpg'
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                // mainAxisSize: MainAxisSize.max,
+                children: [
+                  // Container(
+                  //   height: widget.textSize * 10,
+                  //   width: widget.textSize * 8,
+                  //   decoration: BoxDecoration(
+                  //     image: DecorationImage(
+                  //       image: AssetImage(
+                  //         'images/2022-tshirt.PNG'
+                  //       ),
+                  //       fit: BoxFit.fill,
+                  //     ),
+                  //   ),
+                  // ),
+                  FittedBox(
+                    child: SelectableText(
+                      "\nIf you would like to order a T-Shirt",
+                      style: TextStyle(
+                        fontSize: widget.textSize
                       ),
-                      fit: BoxFit.fill,
                     ),
                   ),
-                ),
-                FittedBox(
-                  child: SelectableText(
-                    "\nIf you would like to order a T-Shirt",
-                    style: TextStyle(
-                      fontSize: widget.textSize
+                  FittedBox(
+                    child: SelectableText(
+                      "outside of registration, click the order",
+                      style: TextStyle(
+                        fontSize: widget.textSize
+                      ),
                     ),
                   ),
-                ),
-                FittedBox(
-                  child: SelectableText(
-                    "outside of registration, click below",
-                    style: TextStyle(
-                      fontSize: widget.textSize
+                  FittedBox(
+                    child: SelectableText(
+                      "button below",
+                      style: TextStyle(
+                        fontSize: widget.textSize
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 10),

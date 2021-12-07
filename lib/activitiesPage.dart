@@ -62,13 +62,13 @@ class _ActivitiesPage extends State<ActivitiesPage> {
     });
 
     return [
-      PollOptions('Riverwalk Boat Ride', fontSize, _padding, Activity.Riverwalk),
+      PollOptions('River Walk Boat Ride', fontSize, _padding, Activity.Riverwalk),
       PollOptions('Almao Tour', fontSize, _padding, Activity.Alamo),
       PollOptions('Six Flags', fontSize, _padding, Activity.SixFlags),
       PollOptions('Sea World', fontSize, _padding, Activity.SeaWorld),
       PollOptions('Natural Bridge Caverns', fontSize, _padding, Activity.Caverns),
       PollOptions('San Antonio Zoo', fontSize, _padding, Activity.Zoo),
-      PollOptions('Double Decker Bus Tour', fontSize, _padding, Activity.Bus),
+      PollOptions('Riverwalk and 3-Day Bus Pass', fontSize, _padding, Activity.Bus),
       PollOptions('San Marcos Outlet', fontSize, _padding, Activity.Shopping),
       PollOptions("Ripley's Believe It or Not", fontSize, _padding, Activity.Ripleys),
       PollOptions('Extreme Escape', fontSize, _padding, Activity.Escape),

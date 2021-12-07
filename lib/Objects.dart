@@ -649,7 +649,6 @@ class AssessmentStatus {
     ret.created = created;
     if(ret.created) {
       ret.invoiceId = object["invoiceId"];
-      print("actual pos = " + "AssessmentPosition.".toLowerCase() + object['position'].toString().toLowerCase());
       ret.position = AssessmentPosition.values.firstWhere(
         (pos) {
           print(pos.toString().toLowerCase());

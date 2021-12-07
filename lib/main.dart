@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:firebase/firebase.dart' as firebase;
 import 'package:firebase/firebase.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_teague_app/Objects.dart';
 import 'package:project_teague_app/activitiesPage.dart';
@@ -66,7 +63,7 @@ class _AppState extends State<App> {
   double titleSize;
 
   SignIn signIn;
-  String displayName = "Anon User";
+  String displayName = "Guest";
 
   StatefulWidget pageBody;
   String pageTitle;

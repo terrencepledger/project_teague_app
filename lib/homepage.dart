@@ -36,6 +36,7 @@ class _HomePage extends State<HomePage> {
       items.addAll([
         CarouselItem(OverviewSlide(context, navigate), sliderController),
         CarouselItem(ItinerarySlide(context, navigate), sliderController),
+        CarouselItem(AirportSlide(context), sliderController),
         CarouselItem(HotelSlide(context), sliderController),
         CarouselItem(ActivitiesSlide(context, navigate), sliderController),
         CarouselItem(TshirtFormSlide(context, navigate), sliderController)
