@@ -78,28 +78,31 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
   void showCreateMembers() {
 
-    CreateMemberPopup(context, setState, (name, email, number, location, dob, tSize, isDirectoryMember) {
-      List<FamilyMember> membersToAdd = [];
-      membersToAdd.add(
-        FamilyMember(name.text, email.text, location, dob)
-      );
-      membersToAdd.forEach(
-        (member) {
-          member.addPhone(number.text);
-          member.tSize = tSize;
-          if(!isDirectoryMember) {
-            member.isDirectoryMember = false;
+    CreateMemberPopup(
+      context, setState, 
+      (name, email, number, location, dob, tSize, isDirectoryMember) {
+        List<FamilyMember> membersToAdd = [];
+        membersToAdd.add(
+          FamilyMember(name.text, email.text, location, dob)
+        );
+        membersToAdd.forEach(
+          (member) {
+            member.addPhone(number.text);
+            member.tSize = tSize;
+            if(!isDirectoryMember) {
+              member.isDirectoryMember = false;
+            }
+            member.id = famRef.push(FamilyMember.toMap(member)).key;
           }
-          member.id = famRef.push(FamilyMember.toMap(member)).key;
+        );
+        if(isDirectoryMember) {
+          setState(() {
+            members.addAll(membersToAdd);
+          });
         }
-      );
-      if(isDirectoryMember) {
-        setState(() {
-          members.addAll(membersToAdd);
-        });
+        Navigator.of(context).pop();
       }
-      Navigator.of(context).pop();
-    }).show();
+    ).show();
     
   }
 
@@ -241,7 +244,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                         ]
                       );
                     } 
-                    else if (members[index].displayInfo().toLowerCase()
+                    else if (members[index].allInfo().toLowerCase()
                       .contains(searchController.text.toLowerCase()) ||
                       members[index].displayInfo().toLowerCase()
                       .contains(searchController.text.toLowerCase())

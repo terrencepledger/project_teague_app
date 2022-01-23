@@ -180,6 +180,9 @@ class _AppState extends State<App> {
       context: context, 
       barrierDismissible: false,
       pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondAnimation) {
+
+        unverified.sort((a, b) => a.name.split(' ').last.compareTo(b.name.split(' ').last));
+
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState2) {
             return Center(
@@ -286,9 +289,9 @@ class _AppState extends State<App> {
 
   }
 
-  void createMember() {
+  void createMember() async {
 
-    CreateMemberPopup(
+    await CreateMemberPopup(
       context, setState, 
       (name, email, number, location, dob, tSize, isDirectoryMember) {
         memberToAssign = FamilyMember(name.text, email.text, location, dob);
@@ -307,6 +310,34 @@ class _AppState extends State<App> {
         Navigator.of(context).pop();
       }
     ).show();
+
+    showAlert();
+
+  }
+
+  Future showAlert()  {
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Registration Not Yet Complete"),
+          content: Text(
+            "Please finish registering for your assessment on this next page! Follow instructions at top of page. Don't worry, you will not have to pay yet!",
+            style: TextStyle(color: Colors.black)
+          ),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                navigate(MenuPage.Registration);
+              },
+            ),
+          ],
+        );
+      },
+    );
 
   }
 

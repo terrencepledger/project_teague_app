@@ -139,7 +139,43 @@ class _OverviewSlideState extends State<OverviewSlide> {
                 ),
                 FittedBox(
                   child: SelectableText(
-                    "\nTo get started, click on",
+                    "\nWhen registering, follow",
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "the instructions at the top.",
+                    style: TextStyle(
+                      fontSize: widget.textSize
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "You are not registered until you",
+                    style: TextStyle(
+                      fontSize: widget.textSize,
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "receive an invoice via email.",
+                    style: TextStyle(
+                      fontSize: widget.textSize,
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: SelectableText(
+                    "\nTo begin registration, click on",
                     style: TextStyle(
                       fontSize: widget.textSize
                     ),
@@ -931,7 +967,7 @@ class _ActivitiesSlideState extends State<ActivitiesSlide> {
                           ),
                           recognizer: new TapGestureRecognizer()
                             ..onTap = () {
-                              launch("https://seaworld.com/san-antonio/#:~:text=Watch%20Video-,Aquatica,-This%20tropical%20paradise");
+                              launch("https://aquatica.com/san-antonio/");
                           }
                         ),
                         TextSpan(
@@ -1121,7 +1157,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
         return true;
       }
       else {
-        showErrorDialog(widget.context, "Order Error", errors);
+        CreateMemberPopup.showErrorDialog(widget.context, "Order Error", errors);
         return false;
       }
 

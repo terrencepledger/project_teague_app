@@ -56,83 +56,6 @@ ScreenType getType(BuildContext context) {
 
 }
 
-void showErrorDialog(BuildContext context, String title, List<InputError> errors) {
-
-  List<String> outputList = [];
-
-  for (InputError error in errors) {
-    switch (error) {
-      case InputError.Name:
-        outputList.add("Please enter a valid name");
-        break;
-      case InputError.Number:
-        outputList.add("Please enter a valid phone number");
-        break;
-      case InputError.Email:
-        outputList.add("Please enter a valid email address");
-        break;
-      case InputError.Member_Shirt:
-        outputList.add("Please select a T-Shirt size");
-        break;
-      case InputError.Order_Shirt:
-        outputList.add("Please select a size for each T-Shirt, or remove extras");
-        break;
-      case InputError.Location:
-        outputList.add("Please enter a valid location");
-        break;
-      case InputError.Delivery:
-        outputList.add("Please enter a valid delivery address, or select 'Pick up'");
-        break;
-      default:
-    }
-  }
-
-  // set up the button
-  Widget okButton = TextButton(
-    child: Text("OK"),
-    onPressed: () { Navigator.pop(context); },
-  );
-
-  // set up the AlertDialog
-  AlertDialog alert = AlertDialog(
-    title: Text(title),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(
-        outputList.length,
-        (index) {
-          return Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: MyBullet(),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: Text(
-                  outputList.elementAt(index), style: TextStyle(color: Colors.black),
-                ),
-              ),
-            ],
-          );
-        }
-      ),
-    ), 
-    actions: [
-      okButton,
-    ],
-  );
-
-  // show the dialog
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return alert;
-    },
-  );
-
-}
-
 class UrlLauncher {
 
   static Widget tryLaunch(String text, String url) {
@@ -293,11 +216,93 @@ class CreateMemberPopup {
 
   }
 
-  void show() {
+  static void showErrorDialog(BuildContext context, String title, List<InputError> errors) {
+
+    List<String> outputList = [];
+
+    for (InputError error in errors) {
+      switch (error) {
+        case InputError.Name:
+          outputList.add("Please enter a valid name");
+          break;
+        case InputError.Number:
+          outputList.add("Please enter a valid phone number");
+          break;
+        case InputError.Email:
+          outputList.add("Please enter a valid email address");
+          break;
+        case InputError.Member_Shirt:
+          outputList.add("Please select a T-Shirt size");
+          break;
+        case InputError.Order_Shirt:
+          outputList.add("Please select a size for each T-Shirt, or remove extras");
+          break;
+        case InputError.Location:
+          outputList.add("Please enter a valid location");
+          break;
+        case InputError.Delivery:
+          outputList.add("Please enter a valid delivery address, or select 'Pick up'");
+          break;
+        case InputError.DoB:
+          outputList.add("Please choose a valid birthdate");
+          break;
+        default:
+          outputList.add("Unknown Error, please check info and try again");
+      }
+    }
+
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () { Navigator.pop(context); },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(title),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(
+          outputList.length,
+          (index) {
+            return Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: MyBullet(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Text(
+                    outputList.elementAt(index), style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          }
+        ),
+      ), 
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+
+  }
+
+  Future<void> show() {
 
     if(getType(context) == ScreenType.Desktop) {
-      
-      showDialog(context: context, builder: 
+      return showDialog(
+        barrierDismissible: false,
+        context: context, builder: 
         (buildContext) {
           return StatefulBuilder(builder: (context, setState2) {
             return AlertDialog(
@@ -452,7 +457,9 @@ class CreateMemberPopup {
     }
 
     else {
-      showDialog(context: context, builder: 
+      return showDialog(
+        barrierDismissible: false,
+        context: context, builder: 
         (buildContext) {
           return StatefulBuilder(builder: (context, setState2) {
             return AlertDialog(
@@ -781,6 +788,7 @@ class TshirtOrder {
 }
 
 class Verification {
+  
   String verifiedId;
   String email;
 
@@ -1097,10 +1105,10 @@ class InvoiceItems{
           toAdd = 100;
           break;
         case FamilyMemberTier.Child:
-          toAdd = 25;
+          toAdd = 30;
           break;
         case FamilyMemberTier.Baby:
-          toAdd = 8;
+          toAdd = 10;
           break;
         default:
       }

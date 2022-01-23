@@ -43,6 +43,9 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   FamilyMember current;
 
+  double size = 18;
+  double padding = 4;
+
   Widget pageBody = Container();
   Widget showPurchaseStatus;
   Widget showPurchasePage;
@@ -69,6 +72,31 @@ class _PaymentsPage extends State<PaymentsPage> {
     paypal = Paypal(context);
 
     loadMembers();
+
+  }
+  
+  void checkSize() {
+
+    double tempSize;
+    double tempPadding;
+    switch (getType(context)) {
+      case ScreenType.Desktop:
+        tempSize = 22;
+        tempPadding = 6;
+        break;
+      case ScreenType.Tablet:
+        tempSize = 18;
+        tempPadding = 4;
+        break;
+      default:
+        tempSize = 13;
+        tempPadding = 2;
+    }
+
+    setState(() {
+      padding = tempPadding;
+      size = tempSize;
+    });
 
   }
 
@@ -222,26 +250,28 @@ class _PaymentsPage extends State<PaymentsPage> {
     showPurchasePage = StatefulBuilder(
       builder: (BuildContext context2, StateSetter setstate2) {
         return Padding(
-          padding: const EdgeInsets.all(14.0),
+          padding: EdgeInsets.all(padding + 3),
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.all(6),
+                padding: EdgeInsets.all(padding + 1),
                 child: Text(                
-                  "Please 'Create A Family Member' For Each Person Attending the Reunion.\nThis Will Add Them To Your Registration",
+                  "Please 'Create A Family Member' For Each Person Attending the Reunion.\nThis Will Add Them To Your Registration. If you are only registering yourself, click submit below.",
                   style: Theme.of(context).textTheme.headline4.copyWith(
+                    fontSize: size + 3,
                     color: Colors.black
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(4),
+                padding: EdgeInsets.all(padding),
                 child: Text(                
                   "** Once All Are Created, Click Submit Below To Create An Invoice **",
                   style: Theme.of(context).textTheme.headline5.copyWith(
                     color: Colors.black,
-                    decoration: TextDecoration.none
+                    decoration: TextDecoration.none,
+                    fontSize: size
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -273,7 +303,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(15.0),
+                padding: EdgeInsets.all(padding + 2),
                 child: ElevatedButton(
                   onPressed: () => showCreateMembers(setstate2),
                   child: Text("Create Family Member")
@@ -294,17 +324,17 @@ class _PaymentsPage extends State<PaymentsPage> {
                   itemBuilder: (context2, index) {
                     searchResults.sort((a, b) => a.name.compareTo(b.name));
                     return Padding(
-                      padding: const EdgeInsets.all(4.0),
+                      padding: EdgeInsets.all(padding - 1),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(4.0),
+                            padding: EdgeInsets.all(padding),
                             child: MyBullet(),
                           ),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.all(4.0),
+                              padding: EdgeInsets.all(padding),
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: CheckboxListTile(
@@ -312,6 +342,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                                     searchResults.elementAt(index).displayInfo(), 
                                     style: TextStyle(
                                       color: Colors.black,
+                                      fontSize: size,
                                       decoration: TextDecoration.none
                                     ),
                                   ), 
@@ -340,7 +371,7 @@ class _PaymentsPage extends State<PaymentsPage> {
                 )
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 15.0),
+                padding: EdgeInsets.only(top: padding + 2),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -349,11 +380,11 @@ class _PaymentsPage extends State<PaymentsPage> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: SelectableText("Total: \$${items.getTotal().toStringAsFixed(2)}",
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(fontSize: size + 2, fontWeight: FontWeight.bold),
                       )
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
+                      padding: EdgeInsets.only(top: padding + 2),
                       child: ElevatedButton(
                         onPressed: () async {
                           
@@ -808,7 +839,7 @@ class _PaymentsPage extends State<PaymentsPage> {
 
   @override
   Widget build(BuildContext context) {
-
+    checkSize();
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
