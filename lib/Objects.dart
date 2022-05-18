@@ -4,7 +4,9 @@ import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:project_teague_app/paypal.dart';
 import 'package:quiver/core.dart';
+import 'package:universal_html/js.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum Activity {
@@ -658,7 +660,6 @@ class AssessmentStatus {
       ret.invoiceId = object["invoiceId"];
       ret.position = AssessmentPosition.values.firstWhere(
         (pos) {
-          print(pos.toString().toLowerCase());
           return pos.toString().toLowerCase() == "AssessmentPosition.".toLowerCase() + object['position'].toString().toLowerCase();
         }
       );
@@ -748,19 +749,54 @@ class MyBullet extends StatelessWidget{
 
 class TshirtOrder {
 
-  String orderName = "";
-  String orderEmail = "";
+  String id;
 
   TshirtDelivery delivery = TshirtDelivery();
+  Map<TshirtSize, int> quantities = {};
+  List<TshirtSize> _shirts = [];
 
-  List<TshirtSize> shirts = [];
+  String orderName = "";
+  String orderNumber = "";
+  String orderEmail = "";
 
-  TshirtOrder();
+  TshirtOrder() {
+    id = DateTime.now().millisecondsSinceEpoch.toString();
+  }
+
+  void addShirt(TshirtSize shirt) {
+
+    _shirts.add(shirt);
+
+    int x = 0;
+    _shirts.forEach((_shirt) { 
+      if (shirt == _shirt) {
+        x++;
+      }
+    });
+
+    quantities[shirt] = x;
+
+  }
+
+  void removeShirt(TshirtSize shirt) {
+
+    _shirts.remove(shirt);
+
+    int x = 0;
+    _shirts.forEach((_shirt) { 
+      if (shirt == _shirt) {
+        x++;
+      }
+    });
+
+    quantities[shirt] = x;
+
+  }
 
   double getTotal() {
 
     double total = 0;
-    for (TshirtSize shirt in shirts) {
+    for (TshirtSize shirt in _shirts) {
       
       if(shirt==null) {
         continue;
@@ -775,7 +811,9 @@ class TshirtOrder {
           total += 10;
           break;
         default:
-          total += 12;
+          if (shirt != null) {
+            total += 15;
+          }
           break;
       }
 
@@ -783,6 +821,10 @@ class TshirtOrder {
 
     return total;
 
+  }
+
+  List<TshirtSize> getShirts() {
+    return _shirts;
   }
 
 }
@@ -970,6 +1012,21 @@ class Invoice{
     InvoiceItems items = InvoiceItems();
     for (var item in object["items"]) {
       switch (item["name"]) {
+        case "T-Shirt Order Form Purchase":
+          TshirtSize size = TshirtSize.values.firstWhere((element) => element.name == item["description"].toString().split('T-Shirt Size: ').last.split(' ').join('_'));
+          for (var i = 0; i < int.parse(item['quantity']); i++) {
+            items.shirtsOrder.addShirt(size);
+          }
+          List<String> orderInfo = details["memo"].toString().split('Order Info: ').last.split(', ');
+          items.shirtsOrder.id = orderInfo[0];
+          items.shirtsOrder.orderName = orderInfo[1];
+          items.shirtsOrder.orderEmail = orderInfo[2];
+          items.shirtsOrder.orderNumber = orderInfo[3];
+          if(orderInfo[4] != "null") {
+            items.shirtsOrder.delivery.needDelivery = true;
+            items.shirtsOrder.delivery.address = orderInfo[4];
+          }
+          break;
         case "T-Shirt Purchase":
         case "Child Assessment":
         case "Adult Assessment":
@@ -982,7 +1039,6 @@ class Invoice{
           });
           items.addMember(member);
           break;
-        default:
       }
     }
 
@@ -1009,6 +1065,7 @@ class Invoice{
 
 class InvoiceItems{
 
+  TshirtOrder shirtsOrder = TshirtOrder();
   List<FamilyMember> assessments = [];
   // Map<Activity, List<FamilyMember>> activities = {};
   // List<TShirtOrder> tshirts = [];
@@ -1028,6 +1085,43 @@ class InvoiceItems{
   List<Map<String, Object>> createItemList() {
 
     List<Map<String, Object>> ret = [];
+
+    shirtsOrder.quantities.keys.forEach((size) { 
+      
+      if(size == null) {
+        return;
+      }
+
+      Map<String, Object> temp = {};
+
+      String sizeName = size.name.split('_').join(' ');
+
+      temp['name'] = "T-Shirt Order Form Purchase";
+      temp['description'] = "T-Shirt Size: $sizeName";
+      temp['quantity'] = shirtsOrder.quantities[size];
+      
+      var cost;
+      switch (size) {
+        case TshirtSize.Youth_XS:
+        case TshirtSize.Youth_XL:
+        case TshirtSize.Youth_S:
+        case TshirtSize.Youth_M:
+        case TshirtSize.Youth_L:
+          cost = 10;
+          break;
+        default:
+          cost = 15;
+          break;
+      }
+
+      temp["unit_amount"] = {
+        "currency_code": "USD",
+        "value": cost.toStringAsFixed(2)
+      };
+
+      ret.add(temp);
+
+    });
 
     assessments.forEach((theMember) {
 
@@ -1115,6 +1209,8 @@ class InvoiceItems{
       total += toAdd;
     });
 
+    total += shirtsOrder.getTotal();
+
     return total;
 
   }
@@ -1127,114 +1223,122 @@ class InvoiceItems{
       newItems.addMember(element);
     });
 
+    newItems.shirtsOrder = oldItems.shirtsOrder;
+
     //oldItems.activities
 
     return newItems;
 
   }
 
-  static List<Map<String, dynamic>> toMap(InvoiceItems items) {
+  // static List<Map<String, dynamic>> toMap(InvoiceItems items) {
 
-    List<Map<String, dynamic>> ret = [];
+  //   List<Map<String, dynamic>> ret = [];
 
-    items.assessments.forEach((theMember) {
+  //   if(items.shirtsOrder._shirts.isNotEmpty) {
+  //     ret.add({
+  //       "type": "shirt"
+  //     })
+  //   }
 
-      Map<String, Object> temp = {}; 
+  //   items.assessments.forEach((theMember) {
 
-      temp["type"] = "member";
-      temp["id"] = theMember.id;
+  //     Map<String, Object> temp = {}; 
 
-      ret.add(temp);
+  //     temp["type"] = "member";
+  //     temp["id"] = theMember.id;
 
-    });
+  //     ret.add(temp);
 
-    // activities.forEach((activity, members) {
+  //   });
+
+  //   // activities.forEach((activity, members) {
       
-    //   ret["name"] = activity.toString().split(".").last;
-    //   ret["description"] = "Group activity ticket";
-    //   ret["quantity"] = "1";
+  //   //   ret["name"] = activity.toString().split(".").last;
+  //   //   ret["description"] = "Group activity ticket";
+  //   //   ret["quantity"] = "1";
 
-    //   int amt;
+  //   //   int amt;
 
-    //   switch (activity) {
-    //     case Activity.Riverwalk:
-    //       amt = 14;
-    //       break;
-    //     case Activity.SixFlags:
-    //       amt = 30;
-    //       break;
-    //     case Activity.SeaWorld:
-    //       amt = 55;
-    //       break;
-    //     case Activity.Aquatica:
-    //       amt = 40;
-    //       break;
-    //     case Activity.Splashtown:
-    //       amt = ;
-    //       break;
-    //     default:
-    //   }
+  //   //   switch (activity) {
+  //   //     case Activity.Riverwalk:
+  //   //       amt = 14;
+  //   //       break;
+  //   //     case Activity.SixFlags:
+  //   //       amt = 30;
+  //   //       break;
+  //   //     case Activity.SeaWorld:
+  //   //       amt = 55;
+  //   //       break;
+  //   //     case Activity.Aquatica:
+  //   //       amt = 40;
+  //   //       break;
+  //   //     case Activity.Splashtown:
+  //   //       amt = ;
+  //   //       break;
+  //   //     default:
+  //   //   }
 
-    //   ret["unit_amount"] = 
+  //   //   ret["unit_amount"] = 
 
-    // })
+  //   // })
 
-    return ret;
+  //   return ret;
 
-  }
+  // }
 
-  static Future<InvoiceItems> fromMap(List<Map<String, dynamic>> object) async {
+  // static Future<InvoiceItems> fromMap(List<Map<String, dynamic>> object) async {
 
-    InvoiceItems items = InvoiceItems();
+  //   InvoiceItems items = InvoiceItems();
 
-    for (var item in object) {
+  //   for (var item in object) {
 
-      switch (item["type"]) {
-        case "member":
-          FamilyMember member;
-          await database().ref("members").child(item["id"])
-          .once('value').then((value) async => member = await FamilyMember.toMember(value.snapshot.val())); 
-          items.addMember(member);
-          break;
-        default:
-      }
+  //     switch (item["type"]) {
+  //       case "member":
+  //         FamilyMember member;
+  //         await database().ref("members").child(item["id"])
+  //         .once('value').then((value) async => member = await FamilyMember.toMember(value.snapshot.val())); 
+  //         items.addMember(member);
+  //         break;
+  //       default:
+  //     }
 
-      // activities.forEach((activity, members) {
+  //     // activities.forEach((activity, members) {
         
-      //   ret["name"] = activity.toString().split(".").last;
-      //   ret["description"] = "Group activity ticket";
-      //   ret["quantity"] = "1";
+  //     //   ret["name"] = activity.toString().split(".").last;
+  //     //   ret["description"] = "Group activity ticket";
+  //     //   ret["quantity"] = "1";
 
-      //   int amt;
+  //     //   int amt;
 
-      //   switch (activity) {
-      //     case Activity.Riverwalk:
-      //       amt = 14;
-      //       break;
-      //     case Activity.SixFlags:
-      //       amt = 30;
-      //       break;
-      //     case Activity.SeaWorld:
-      //       amt = 55;
-      //       break;
-      //     case Activity.Aquatica:
-      //       amt = 40;
-      //       break;
-      //     case Activity.Splashtown:
-      //       amt = ;
-      //       break;
-      //     default:
-      //   }
+  //     //   switch (activity) {
+  //     //     case Activity.Riverwalk:
+  //     //       amt = 14;
+  //     //       break;
+  //     //     case Activity.SixFlags:
+  //     //       amt = 30;
+  //     //       break;
+  //     //     case Activity.SeaWorld:
+  //     //       amt = 55;
+  //     //       break;
+  //     //     case Activity.Aquatica:
+  //     //       amt = 40;
+  //     //       break;
+  //     //     case Activity.Splashtown:
+  //     //       amt = ;
+  //     //       break;
+  //     //     default:
+  //     //   }
 
-      //   ret["unit_amount"] = 
+  //     //   ret["unit_amount"] = 
 
-      // })
+  //     // })
 
-    }
+  //   }
 
-    return items;
+  //   return items;
 
-  }
+  // }
 
 }
 

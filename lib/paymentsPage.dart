@@ -108,7 +108,7 @@ class _PaymentsPage extends State<PaymentsPage> {
         
         try{
 
-          Invoice invoice = await paypal.createInvoice(hoh, items);
+          Invoice invoice = await paypal.createAssessmentInvoice(hoh, items);
 
           responseMessage = Text("Invoice successfully sent to: " + hoh.email);
           
@@ -149,7 +149,7 @@ class _PaymentsPage extends State<PaymentsPage> {
       }
       else {
         try {
-          await paypal.modifyInvoice(context, hoh, items);
+          await paypal.modifyAssessmentInvoice(context, hoh, items);
           hoh.assessmentStatus.invoice.items.assessments.forEach((member) {
             if(!items.assessments.contains(member)) {
               ref.child(member.id).update({'assessmentStatus': {'created': false}});
@@ -169,7 +169,6 @@ class _PaymentsPage extends State<PaymentsPage> {
           );
         }
         on PaypalError catch (e) {
-          print(e.details);
           responseMessage = Text(
             "Unable to modify and re-send invoice. Please note error code: ${e.code} - '${e.reason}' and contact Terrence Pledger for further assistance",
             style: TextStyle(
@@ -208,7 +207,6 @@ class _PaymentsPage extends State<PaymentsPage> {
             }
           ).value
         );
-        print(current.name);
         current.id = id;
 
         if(current.assessmentStatus.created) {

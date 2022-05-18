@@ -1,16 +1,16 @@
+import 'dart:io';
+
 import 'package:firebase/firebase.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:intl/intl.dart';
 import 'package:project_teague_app/paypal.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
-import 'dart:ui' as ui;
-import 'dart:js' as js;
 import 'package:universal_html/html.dart' as html;
 import 'Objects.dart';
+import 'dart:html' as html;
+import 'dart:js' as js;
+import 'dart:ui' as ui;
 
 // ignore: must_be_immutable
 class OverviewSlide extends StatefulWidget {
@@ -1129,8 +1129,17 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
   }
 
   void tshirtForm() {
-
+    
     TshirtOrder order = TshirtOrder();
+
+    html.window.postMessage("Total:${0.toStringAsFixed(2)}", "*");
+
+    html.window.onMessage.listen((event) {
+      if(event.data.toString() == "onApproved") {
+        Navigator.of(context).pop();
+        Paypal(context).createTshirtInvoice(order);
+      }
+    });
 
     bool valid() {
 
@@ -1142,11 +1151,14 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
       if(order.orderEmail.isEmpty) {
         errors.add(InputError.Email);
       }
+      if(order.orderNumber.isEmpty) {
+        errors.add(InputError.Number);
+      }
       if(order.delivery.needDelivery && order.delivery.address.isEmpty) {
         errors.add(InputError.Delivery);
       }
       
-      for (TshirtSize shirt in order.shirts) {
+      for (TshirtSize shirt in order.getShirts()) {
         if(shirt == null) {
           errors.add(InputError.Order_Shirt);
           break;
@@ -1157,39 +1169,43 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
         return true;
       }
       else {
-        CreateMemberPopup.showErrorDialog(widget.context, "Order Error", errors);
+        // CreateMemberPopup.showErrorDialog(widget.context, "Order Error", errors);
         return false;
       }
 
     }
-    
-    void submit() async {
 
-      // Database db = database();
-      // db.ref('shirt-orders').push(TshirtOrder.toMap(order));
-      Paypal paypal = Paypal(widget.context);
-      var link = await paypal.createOrder(order);
-      
-      if(link.isNotEmpty) {
-        launch(link);
+    void submitOrder() async {
+
+      if(getType(context) != ScreenType.Desktop) {
+        Navigator.of(context).pop();
+      }
+      Navigator.of(context).pop();
+
+      try {
+        await Paypal(context).createTshirtInvoice(order);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Successfully sent T-Shirt Invoice to ${order.orderEmail}"),
+          duration: Duration(seconds: 4),
+        ));
+      } on PaypalError catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error Creating T-Shirt Invoice: ${e.details} - ${e.reason}"),
+          duration: Duration(seconds: 4),
+        ));
       }
 
-      // onGooglePlay
+    }
 
-      // ScaffoldMessenger.of(widget.context).showSnackBar(
-      //   SnackBar(
-      //     content: Text("Successfully submitted order! Receipt sent to: ${order.orderEmail}"),
-      //     duration: Duration(seconds: 6),
-      //   )
-      // );
-
+    void updateOrder() async {
+      await Future.delayed(Duration(milliseconds: 250));
+      html.window.postMessage("Total:${order.getTotal().toStringAsFixed(2)}", "*");
     }
 
     showDialog(context: widget.context, builder: 
         (buildContext) {
-          order.shirts.add(null);
-          return StatefulBuilder(builder: (context, setState2) {
-            
+          order.addShirt(null);
+          return StatefulBuilder(builder: (context, setState2) {         
             return getType(context) == ScreenType.Desktop ? AlertDialog(
               content: Container(
                 constraints: BoxConstraints(
@@ -1249,6 +1265,22 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                       onChanged: (newEmail) {
                                         setState2(() {
                                           order.orderEmail = newEmail;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: TextFormField(
+                                      style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
+                                      decoration: InputDecoration(
+                                        labelText: "Number", labelStyle: TextStyle(color: Colors.black)
+                                      ),
+                                      onChanged: (newNumber) {
+                                        setState2(() {
+                                          order.orderNumber = newNumber;
                                         });
                                       },
                                     ),
@@ -1335,7 +1367,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: List.generate(
-                                  order.shirts.length, 
+                                  order.getShirts().length, 
                                   (index) => Padding(
                                     padding: const EdgeInsets.all(4.0),
                                     child: Row(
@@ -1357,7 +1389,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                               color: Colors.black
                                             ),
                                           ),
-                                          value: order.shirts.elementAt(index),
+                                          value: order.getShirts().elementAt(index),
                                           dropdownColor: Colors.white,
                                           style: TextStyle(color: Colors.black),
                                           items: List.generate(TshirtSize.values.length, (index) {
@@ -1376,7 +1408,9 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                           }),
                                           onChanged: (newSize) {
                                             setState2(() {
-                                              order.shirts[index] = newSize;
+                                              order.removeShirt(order.getShirts()[index]);
+                                              order.addShirt(newSize);
+                                              updateOrder();
                                             });
                                           },
                                         ),
@@ -1387,9 +1421,10 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                               Icons.delete_forever
                                             ),
                                             onPressed: () {
-                                              if(order.shirts.length > 1) {
+                                              if(order.getShirts().length > 1) {
                                                 setState2(() {
-                                                  order.shirts.removeAt(index);
+                                                  order.removeShirt(order.getShirts()[index]);
+                                                  updateOrder();
                                                 });
                                               }
                                             },
@@ -1419,7 +1454,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                 ),
                                 onPressed: () {
                                   setState2(() {
-                                    order.shirts.add(null);
+                                    order.addShirt(null);
                                   });
                                 },
                               ),
@@ -1453,15 +1488,9 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 10.0),
-                            child: ElevatedButton(
-                              child: Text("Submit"),
-                              onPressed: () {
-                                if(valid()) {
-                                  Navigator.of(context).pop();
-                                  submit();
-                                }
-                              },
-                            )
+                            child: valid() ? ElevatedButton(onPressed: () {
+                              submitOrder();
+                            }, child: Text("Create Invoice")) : ElevatedButton(onPressed: null, child: Text("Please enter valid information and select at least 1 T-Shirt Size"))
                           )
                         ]
                       )
@@ -1536,6 +1565,22 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                     ),
                                   ),
                                 ),
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: TextFormField(
+                                      style: TextStyle(color: Colors.black, decoration: TextDecoration.none),
+                                      decoration: InputDecoration(
+                                        labelText: "Number", labelStyle: TextStyle(color: Colors.black)
+                                      ),
+                                      onChanged: (newNumber) {
+                                        setState2(() {
+                                          order.orderNumber = newNumber;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -1600,7 +1645,6 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                           showDialog(
                             context: widget.context, 
                             builder: (BuildContext context) {
-
                               return StatefulBuilder(
                                 builder: (BuildContext context, setState2) {
                                   return AlertDialog(
@@ -1630,7 +1674,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                                   child: Column(
                                                     mainAxisSize: MainAxisSize.min,
                                                     children: List.generate(
-                                                      order.shirts.length, 
+                                                      order.getShirts().length, 
                                                       (index) => Padding(
                                                         padding: const EdgeInsets.all(4.0),
                                                         child: Row(
@@ -1652,7 +1696,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                                                   color: Colors.black
                                                                 ),
                                                               ),
-                                                              value: order.shirts.elementAt(index),
+                                                              value: order.getShirts().elementAt(index),
                                                               dropdownColor: Colors.white,
                                                               style: TextStyle(color: Colors.black),
                                                               items: List.generate(TshirtSize.values.length, (index) {
@@ -1671,7 +1715,9 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                                               }),
                                                               onChanged: (newSize) {
                                                                 setState2(() {
-                                                                  order.shirts[index] = newSize;
+                                                                  order.removeShirt(order.getShirts()[index]);
+                                                                  order.addShirt(newSize);
+                                                                  updateOrder();
                                                                 });
                                                               },
                                                             ),
@@ -1682,9 +1728,10 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                                                   Icons.delete_forever
                                                                 ),
                                                                 onPressed: () {
-                                                                  if(order.shirts.length > 1) {
+                                                                  if(order.getShirts().length > 1) {
                                                                     setState2(() {
-                                                                      order.shirts.removeAt(index);
+                                                                      order.removeShirt(order.getShirts()[index]);
+                                                                      updateOrder();
                                                                     });
                                                                   }
                                                                 },
@@ -1714,7 +1761,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                                     ),
                                                     onPressed: () {
                                                       setState2(() {
-                                                        order.shirts.add(null);
+                                                        order.addShirt(null);
                                                       });
                                                     },
                                                   ),
@@ -1748,14 +1795,11 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                                               ),
                                               Padding(
                                                 padding: const EdgeInsets.only(top: 10.0),
-                                                child: ElevatedButton(
-                                                  child: Text("Submit"),
-                                                  onPressed: () {
-                                                    if(valid()) {
-                                                      Navigator.of(context).pop();
-                                                      submit();
-                                                    }
-                                                  },
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(top: 10.0),
+                                                  child: valid() ? ElevatedButton(onPressed: () {
+                                                    submitOrder();
+                                                  }, child: Text("Create Invoice")) : ElevatedButton(onPressed: null, child: Text("Please enter all info & select at least One Size"))
                                                 )
                                               ),
                                             ],
@@ -1780,8 +1824,7 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
           });
         }
     );
-                
-
+  
   }
 
   @override
@@ -1836,18 +1879,18 @@ class _TshirtFormSlideState extends State<TshirtFormSlide> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 // mainAxisSize: MainAxisSize.max,
                 children: [
-                  // Container(
-                  //   height: widget.textSize * 10,
-                  //   width: widget.textSize * 8,
-                  //   decoration: BoxDecoration(
-                  //     image: DecorationImage(
-                  //       image: AssetImage(
-                  //         'images/2022-tshirt.PNG'
-                  //       ),
-                  //       fit: BoxFit.fill,
-                  //     ),
-                  //   ),
-                  // ),
+                  FittedBox(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SizedBox(
+                        // height: 300,
+                        width: getType(context) == ScreenType.Desktop ? 350 : 150,
+                        child: Image.asset(
+                          'images/2022-tshirt.png'
+                        ),
+                      ),
+                    ),
+                  ),
                   FittedBox(
                     child: SelectableText(
                       "\nIf you would like to order a T-Shirt",
